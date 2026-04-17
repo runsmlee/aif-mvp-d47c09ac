@@ -1,0 +1,5 @@
+node_modules/
+.vite/
+dist/
+_deploy_helper.mjs
+*.log
