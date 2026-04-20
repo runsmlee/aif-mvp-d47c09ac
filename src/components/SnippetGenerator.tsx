@@ -16,9 +16,9 @@ function generateCode(
   if (!template || !params) return '';
 
   const templatesMap: Record<string, string> = {
-    'waitlist-unlock': `import { ViralKit } from '@viralkit/sdk';
+    'waitlist-unlock': `import { LoopEngine } from '@loopengine/sdk';
 
-const waitlist = ViralKit.createLoop({
+const waitlist = LoopEngine.createLoop({
   name: '${params.loopName}',
   type: 'waitlist_position',
   config: {
@@ -39,9 +39,9 @@ export default function WaitlistWidget() {
   );
 }`,
 
-    'referral-link': `import { ViralKit } from '@viralkit/sdk';
+    'referral-link': `import { LoopEngine } from '@loopengine/sdk';
 
-const referral = ViralKit.createLoop({
+const referral = LoopEngine.createLoop({
   name: '${params.loopName}',
   type: 'threshold',
   config: {
@@ -62,9 +62,9 @@ export default function ReferralWidget() {
   );
 }`,
 
-    'tiered-rewards': `import { ViralKit } from '@viralkit/sdk';
+    'tiered-rewards': `import { LoopEngine } from '@loopengine/sdk';
 
-const tiered = ViralKit.createLoop({
+const tiered = LoopEngine.createLoop({
   name: '${params.loopName}',
   type: 'tiered_milestones',
   config: {
@@ -88,9 +88,9 @@ export default function TieredRewardsWidget() {
   );
 }`,
 
-    'team-invite': `import { ViralKit } from '@viralkit/sdk';
+    'team-invite': `import { LoopEngine } from '@loopengine/sdk';
 
-const team = ViralKit.createLoop({
+const team = LoopEngine.createLoop({
   name: '${params.loopName}',
   type: 'threshold',
   config: {
@@ -111,9 +111,9 @@ export default function TeamInviteWidget() {
   );
 }`,
 
-    'freemium-gate': `import { ViralKit } from '@viralkit/sdk';
+    'freemium-gate': `import { LoopEngine } from '@loopengine/sdk';
 
-const freemium = ViralKit.createLoop({
+const freemium = LoopEngine.createLoop({
   name: '${params.loopName}',
   type: 'threshold',
   config: {
@@ -134,9 +134,9 @@ export default function FreemiumGateWidget() {
   );
 }`,
 
-    'early-access': `import { ViralKit } from '@viralkit/sdk';
+    'early-access': `import { LoopEngine } from '@loopengine/sdk';
 
-const earlyAccess = ViralKit.createLoop({
+const earlyAccess = LoopEngine.createLoop({
   name: '${params.loopName}',
   type: 'waitlist_position',
   config: {
@@ -178,6 +178,19 @@ export function SnippetGenerator({
     }
   }, [code]);
 
+  const handleDownload = useCallback(() => {
+    if (!code || !selectedTemplate) return;
+    const blob = new Blob([code], { type: 'text/typescript' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${params?.loopName || selectedTemplate.id}.tsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [code, selectedTemplate, params]);
+
   const handleTemplateChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const id = e.target.value;
@@ -205,7 +218,7 @@ export function SnippetGenerator({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-white tracking-tight">Snippet Generator</h2>
-          <p className="text-xs text-gray-500 mt-0.5">Generate integration code for your viral loops</p>
+          <p className="text-xs text-gray-500 mt-0.5">Generate LoopEngine SDK integration code</p>
         </div>
       </div>
 
@@ -237,6 +250,18 @@ export function SnippetGenerator({
         <div className="flex flex-col gap-4">
           {/* Parameter fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-2 flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Loop Name</label>
+              <input
+                type="text"
+                value={params.loopName}
+                onChange={(e) =>
+                  handleParamChange('loopName', e.target.value)
+                }
+                className="input-base"
+                placeholder="e.g. my-referral-loop"
+              />
+            </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Incentive Type</label>
               <select
@@ -287,16 +312,51 @@ export function SnippetGenerator({
                 {code}
               </pre>
             </div>
-            <button
-              onClick={handleCopy}
-              className="absolute top-3 right-3 btn-secondary text-xs px-3 py-1.5 opacity-70 group-hover:opacity-100 transition-opacity"
-              aria-label="Copy code snippet"
-            >
-              <svg className="w-3.5 h-3.5 mr-1.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              Copy
-            </button>
+            <div className="absolute top-3 right-3 flex gap-2">
+              <button
+                onClick={handleCopy}
+                className="btn-secondary text-xs px-3 py-1.5 opacity-70 group-hover:opacity-100 transition-opacity"
+                aria-label="Copy code snippet"
+              >
+                <svg className="w-3.5 h-3.5 mr-1.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Copy
+              </button>
+              <button
+                onClick={handleDownload}
+                className="btn-secondary text-xs px-3 py-1.5 opacity-70 group-hover:opacity-100 transition-opacity"
+                aria-label="Download code file"
+              >
+                <svg className="w-3.5 h-3.5 mr-1.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download
+              </button>
+            </div>
+          </div>
+
+          {/* Integration Guide */}
+          <div data-testid="integration-guide" className="metric-card">
+            <h3 className="text-sm font-semibold text-white mb-3">Integration Guide</h3>
+            <ol className="flex flex-col gap-2.5 text-sm text-gray-400">
+              <li className="flex gap-2.5">
+                <span className="flex-shrink-0 w-5 h-5 rounded-md bg-brand-500/10 text-brand-400 text-xs font-bold flex items-center justify-center">1</span>
+                <span>Install the SDK: <code className="text-emerald-400 font-mono text-xs">npm install @loopengine/sdk</code></span>
+              </li>
+              <li className="flex gap-2.5">
+                <span className="flex-shrink-0 w-5 h-5 rounded-md bg-brand-500/10 text-brand-400 text-xs font-bold flex items-center justify-center">2</span>
+                <span>Add your API key to <code className="text-emerald-400 font-mono text-xs">.env</code>: <code className="text-emerald-400 font-mono text-xs">VITE_LOOPENGINE_KEY=your_key</code></span>
+              </li>
+              <li className="flex gap-2.5">
+                <span className="flex-shrink-0 w-5 h-5 rounded-md bg-brand-500/10 text-brand-400 text-xs font-bold flex items-center justify-center">3</span>
+                <span>Paste the generated code into your component file</span>
+              </li>
+              <li className="flex gap-2.5">
+                <span className="flex-shrink-0 w-5 h-5 rounded-md bg-brand-500/10 text-brand-400 text-xs font-bold flex items-center justify-center">4</span>
+                <span>Import and render the widget in your app</span>
+              </li>
+            </ol>
           </div>
         </div>
       ) : (

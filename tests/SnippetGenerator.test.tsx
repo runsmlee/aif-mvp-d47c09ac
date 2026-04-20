@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SnippetGenerator } from '../src/components/SnippetGenerator';
 import { templates } from '../src/data/templates';
@@ -86,5 +86,42 @@ describe('SnippetGenerator', () => {
     expect(
       screen.getByText(/select a template to generate/i)
     ).toBeInTheDocument();
+  });
+
+  it('shows integration guide when a template is selected', () => {
+    const params = {
+      incentiveType: 'threshold' as const,
+      threshold: 3,
+      reward: 'Unlock Pro tier',
+      loopName: 'referral-link',
+    };
+    render(
+      <SnippetGenerator
+        {...defaultProps}
+        selectedTemplate={templates[1]}
+        params={params}
+      />
+    );
+    expect(screen.getByTestId('integration-guide')).toBeInTheDocument();
+    expect(screen.getByText(/integration guide/i)).toBeInTheDocument();
+  });
+
+  it('generates code referencing LoopEngine SDK', () => {
+    const params = {
+      incentiveType: 'threshold' as const,
+      threshold: 3,
+      reward: 'Unlock Pro tier',
+      loopName: 'referral-link',
+    };
+    render(
+      <SnippetGenerator
+        {...defaultProps}
+        selectedTemplate={templates[1]}
+        params={params}
+      />
+    );
+    const codeOutput = screen.getByTestId('code-output');
+    expect(codeOutput.textContent).toContain('LoopEngine');
+    expect(codeOutput.textContent).toContain('@loopengine/sdk');
   });
 });

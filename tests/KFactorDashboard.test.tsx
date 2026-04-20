@@ -47,4 +47,30 @@ describe('KFactorDashboard', () => {
     );
     expect(screen.getByText(/no data yet/i)).toBeInTheDocument();
   });
+
+  it('shows exponential growth banner when K-factor is above 1', () => {
+    render(<KFactorDashboard data={mockAnalyticsData} />);
+    expect(screen.getByTestId('growth-banner')).toBeInTheDocument();
+    expect(screen.getByText(/exponential growth detected/i)).toBeInTheDocument();
+  });
+
+  it('does not show growth banner when K-factor is below 1', () => {
+    render(
+      <KFactorDashboard
+        data={{
+          kFactor: 0.5,
+          inviteCount: 100,
+          conversionRate: 0.1,
+          activeParticipants: 50,
+          trend: [{ date: '2024-01-01', value: 0.5 }],
+        }}
+      />
+    );
+    expect(screen.queryByTestId('growth-banner')).not.toBeInTheDocument();
+  });
+
+  it('shows HIGH badge when K-factor >= 1', () => {
+    render(<KFactorDashboard data={mockAnalyticsData} />);
+    expect(screen.getByText('HIGH')).toBeInTheDocument();
+  });
 });

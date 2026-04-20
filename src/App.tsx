@@ -1,13 +1,22 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import type { ViralTemplate, TemplateParams, IncentiveRule, AppView } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { mockAnalyticsData } from './data/mockAnalytics';
 import { templates } from './data/templates';
-import { SnippetGenerator } from './components/SnippetGenerator';
-import { KFactorDashboard } from './components/KFactorDashboard';
-import { IncentiveBuilder } from './components/IncentiveBuilder';
-import { TemplateLibrary } from './components/TemplateLibrary';
 import { LivePreview } from './components/LivePreview';
+
+const SnippetGenerator = lazy(() =>
+  import('./components/SnippetGenerator').then((m) => ({ default: m.SnippetGenerator }))
+);
+const KFactorDashboard = lazy(() =>
+  import('./components/KFactorDashboard').then((m) => ({ default: m.KFactorDashboard }))
+);
+const IncentiveBuilder = lazy(() =>
+  import('./components/IncentiveBuilder').then((m) => ({ default: m.IncentiveBuilder }))
+);
+const TemplateLibrary = lazy(() =>
+  import('./components/TemplateLibrary').then((m) => ({ default: m.TemplateLibrary }))
+);
 
 type NavItem = {
   id: AppView;
@@ -41,9 +50,9 @@ function Sidebar({
           </div>
           <div>
             <h1 className="text-base font-bold text-white tracking-tight leading-none">
-              <span className="text-brand-500">Viral</span>Kit
+              <span className="text-brand-500">Loop</span>Engine
             </h1>
-            <p className="text-[10px] text-gray-500 mt-0.5 font-medium tracking-wide uppercase">Growth Toolkit</p>
+            <p className="text-[10px] text-gray-500 mt-0.5 font-medium tracking-wide uppercase">Engineer Your Virality</p>
           </div>
         </div>
       </div>
@@ -85,7 +94,7 @@ function Sidebar({
       <div className="px-5 py-4 border-t border-gray-800/60">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-          <p className="text-[11px] text-gray-500 font-mono">v1.0.0-beta</p>
+          <p className="text-[11px] text-gray-500 font-mono">v1.1.0</p>
         </div>
       </div>
     </aside>
@@ -96,11 +105,11 @@ export function App() {
   const [activeView, setActiveView] = useState<AppView>('generator');
   const [selectedTemplate, setSelectedTemplate] =
     useLocalStorage<ViralTemplate | null>(
-      'viralkit_selected_template',
+      'loopengine_selected_template',
       null
     );
   const [params, setParams] = useLocalStorage<TemplateParams | null>(
-    'viralkit_params',
+    'loopengine_params',
     null
   );
   const [incentiveRules, setIncentiveRules] = useState<IncentiveRule[]>([]);
@@ -136,35 +145,56 @@ export function App() {
 
   const loopType = selectedTemplate?.category ?? null;
 
+  function LoadingFallback() {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
+          <p className="text-xs text-gray-500 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   const renderContent = () => {
     switch (activeView) {
       case 'generator':
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <SnippetGenerator
-              selectedTemplate={selectedTemplate}
-              params={params}
-              onParamsChange={handleParamsChange}
-              onTemplateSelect={handleTemplateSelect}
-            />
-            <LivePreview loopType={loopType} params={params} />
-          </div>
+          <Suspense fallback={<LoadingFallback />}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <SnippetGenerator
+                selectedTemplate={selectedTemplate}
+                params={params}
+                onParamsChange={handleParamsChange}
+                onTemplateSelect={handleTemplateSelect}
+              />
+              <LivePreview loopType={loopType} params={params} />
+            </div>
+          </Suspense>
         );
       case 'analytics':
-        return <KFactorDashboard data={mockAnalyticsData} />;
+        return (
+          <Suspense fallback={<LoadingFallback />}>
+            <KFactorDashboard data={mockAnalyticsData} />
+          </Suspense>
+        );
       case 'builder':
         return (
-          <IncentiveBuilder
-            rules={incentiveRules}
-            onRulesChange={setIncentiveRules}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <IncentiveBuilder
+              rules={incentiveRules}
+              onRulesChange={setIncentiveRules}
+            />
+          </Suspense>
         );
       case 'templates':
         return (
-          <TemplateLibrary
-            onSelectTemplate={handleTemplateSelect}
-            activeTemplateId={selectedTemplate?.id ?? null}
-          />
+          <Suspense fallback={<LoadingFallback />}>
+            <TemplateLibrary
+              onSelectTemplate={handleTemplateSelect}
+              activeTemplateId={selectedTemplate?.id ?? null}
+            />
+          </Suspense>
         );
       default:
         return null;
@@ -175,28 +205,29 @@ export function App() {
     <div className="flex min-h-screen bg-gray-950">
       <Sidebar activeView={activeView} onNavigate={setActiveView} />
 
-      {/* Mobile top bar — visually shown on mobile, hidden from a11y tree (sidebar is primary nav) */}
-      <div className="md:hidden fixed top-0 inset-x-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800/60" aria-hidden="true">
+      {/* Mobile top bar — primary navigation on mobile, hidden on desktop where sidebar takes over */}
+      <div className="md:hidden fixed top-0 inset-x-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800/60">
         <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" aria-hidden="true">
             <div className="w-7 h-7 rounded-lg bg-brand-500/10 flex items-center justify-center">
               <svg className="w-3.5 h-3.5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <span className="text-sm font-bold text-white" aria-label="ViralKit">VK</span>
+            <span className="text-sm font-bold text-white">LoopEngine</span>
           </div>
-          <nav className="flex gap-1">
+          <nav className="flex gap-1" aria-label="Mobile navigation">
             {NAV_ITEMS.map((item) => (
               <button
                 key={item.id}
                 onClick={() => setActiveView(item.id)}
-                className={`p-2 rounded-lg transition-colors ${
+                className={`p-2 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center ${
                   activeView === item.id
                     ? 'text-brand-500 bg-brand-500/10'
                     : 'text-gray-400 hover:text-gray-200'
                 }`}
-                tabIndex={-1}
+                aria-label={item.label}
+                aria-current={activeView === item.id ? 'page' : undefined}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.icon} />

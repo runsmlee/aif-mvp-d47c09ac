@@ -10,24 +10,37 @@ function MetricCard({
   value,
   testId,
   accent,
+  badge,
 }: {
   label: string;
   value: string;
   testId: string;
   accent?: boolean;
+  badge?: string;
 }) {
   return (
     <div className="metric-card group" data-testid={testId}>
       <p className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold mb-2">
         {label}
       </p>
-      <p
-        className={`text-2xl font-bold font-mono tracking-tight ${
-          accent ? 'text-brand-400' : 'text-white'
-        }`}
-      >
-        {value}
-      </p>
+      <div className="flex items-center gap-2">
+        <p
+          className={`text-2xl font-bold font-mono tracking-tight ${
+            accent ? 'text-brand-400' : 'text-white'
+          }`}
+        >
+          {value}
+        </p>
+        {badge && (
+          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+            badge === 'HIGH'
+              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+              : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+          }`}>
+            {badge}
+          </span>
+        )}
+      </div>
       {accent && (
         <div className="mt-2 h-1 w-12 rounded-full bg-gradient-to-r from-brand-500 to-brand-600 opacity-60 group-hover:opacity-100 transition-opacity" />
       )}
@@ -126,6 +139,8 @@ function TrendChart({ data }: { data: AnalyticsData['trend'] }) {
 export function KFactorDashboard({ data }: KFactorDashboardProps) {
   const isEmpty = data.trend.length === 0 && data.kFactor === 0;
 
+  const kFactorBadge = data.kFactor >= 1 ? 'HIGH' : data.kFactor > 0 ? 'LOW' : undefined;
+
   const formattedData = useMemo(
     () => ({
       kFactor: data.kFactor.toFixed(2),
@@ -142,6 +157,23 @@ export function KFactorDashboard({ data }: KFactorDashboardProps) {
         <h2 className="text-lg font-semibold text-white tracking-tight">K-Factor Analytics</h2>
         <p className="text-xs text-gray-500 mt-0.5">Track your viral growth metrics in real time</p>
       </div>
+
+      {/* Growth Status Banner */}
+      {data.kFactor > 1 && data.trend.length > 0 && (
+        <div data-testid="growth-banner" className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+            <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-emerald-400">Exponential Growth Detected</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              K-Factor {formattedData.kFactor} &gt; 1.0 — Each user brings in more than one new user on average.
+            </p>
+          </div>
+        </div>
+      )}
 
       {isEmpty ? (
         <div className="metric-card text-center py-16 text-gray-500">
@@ -174,6 +206,7 @@ export function KFactorDashboard({ data }: KFactorDashboardProps) {
               value={formattedData.kFactor}
               testId="kfactor-value"
               accent
+              badge={kFactorBadge}
             />
             <MetricCard
               label="Total Invites"

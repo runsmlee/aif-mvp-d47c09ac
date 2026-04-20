@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import type { IncentiveRule, IncentiveType } from '../types';
 
 interface IncentiveBuilderProps {
@@ -28,11 +28,13 @@ function RuleRow({
   index,
   onUpdate,
   onRemove,
+  showErrors,
 }: {
   rule: IncentiveRule;
   index: number;
   onUpdate: (index: number, updated: IncentiveRule) => void;
   onRemove: (index: number) => void;
+  showErrors: boolean;
 }) {
   const handleChange = (
     field: keyof IncentiveRule,
@@ -42,6 +44,11 @@ function RuleRow({
   };
 
   const isComplete = !!(rule.trigger && rule.condition && rule.reward);
+
+  const missingFields: string[] = [];
+  if (showErrors && !rule.trigger) missingFields.push('Trigger');
+  if (showErrors && !rule.condition) missingFields.push('Condition');
+  if (showErrors && !rule.reward) missingFields.push('Reward');
 
   return (
     <div className="bg-gray-800/30 border border-gray-700/60 rounded-xl p-5 transition-all hover:border-gray-600/60">
@@ -72,6 +79,18 @@ function RuleRow({
         </button>
       </div>
 
+      {/* Validation errors */}
+      {missingFields.length > 0 && (
+        <div data-testid="validation-errors" className="mb-4 bg-red-500/5 border border-red-500/20 rounded-lg p-3 flex items-start gap-2">
+          <svg className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-xs text-red-400">
+            Missing required fields: <span className="font-semibold">{missingFields.join(', ')}</span>
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Type</label>
@@ -90,7 +109,7 @@ function RuleRow({
           <select
             value={rule.trigger}
             onChange={(e) => handleChange('trigger', e.target.value)}
-            className="input-base"
+            className={`input-base ${showErrors && !rule.trigger ? 'border-red-500/50 ring-1 ring-red-500/20' : ''}`}
           >
             <option value="">Select trigger...</option>
             {TRIGGER_OPTIONS.map((t) => (
@@ -105,7 +124,7 @@ function RuleRow({
           <select
             value={rule.condition}
             onChange={(e) => handleChange('condition', e.target.value)}
-            className="input-base"
+            className={`input-base ${showErrors && !rule.condition ? 'border-red-500/50 ring-1 ring-red-500/20' : ''}`}
           >
             <option value="">Select condition...</option>
             {CONDITION_OPTIONS.map((c) => (
@@ -122,7 +141,7 @@ function RuleRow({
             value={rule.reward}
             onChange={(e) => handleChange('reward', e.target.value)}
             placeholder="e.g. unlock_pro_tier"
-            className="input-base"
+            className={`input-base ${showErrors && !rule.reward ? 'border-red-500/50 ring-1 ring-red-500/20' : ''}`}
           />
         </div>
       </div>
@@ -134,6 +153,7 @@ export function IncentiveBuilder({
   rules,
   onRulesChange,
 }: IncentiveBuilderProps) {
+  const [showValidation, setShowValidation] = useState(false);
   const allRulesValid = rules.every(
     (r) => r.trigger && r.condition && r.reward
   );
@@ -167,6 +187,10 @@ export function IncentiveBuilder({
   );
 
   const handleExport = useCallback(() => {
+    if (!canExport) {
+      setShowValidation(true);
+      return;
+    }
     const config = {
       version: '1.0.0',
       rules: rules.map((r) => ({
@@ -178,7 +202,7 @@ export function IncentiveBuilder({
       })),
     };
     navigator.clipboard.writeText(JSON.stringify(config, null, 2));
-  }, [rules]);
+  }, [rules, canExport]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -202,7 +226,7 @@ export function IncentiveBuilder({
           </button>
           <button
             onClick={handleExport}
-            disabled={!canExport}
+            disabled={rules.length === 0}
             className="btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Export JSON"
           >
@@ -249,6 +273,7 @@ export function IncentiveBuilder({
               index={index}
               onUpdate={handleUpdateRule}
               onRemove={handleRemoveRule}
+              showErrors={showValidation}
             />
           ))}
         </div>

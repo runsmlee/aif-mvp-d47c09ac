@@ -35,7 +35,10 @@ describe('IncentiveBuilder', () => {
     ];
     render(<IncentiveBuilder {...defaultProps} rules={rules} />);
     const exportButton = screen.getByRole('button', { name: /export json/i });
-    expect(exportButton).toBeDisabled();
+    // Button is not disabled (only disabled when no rules), but clicking shows errors
+    expect(exportButton).not.toBeDisabled();
+    await userEvent.click(exportButton);
+    expect(screen.getByTestId('validation-errors')).toBeInTheDocument();
   });
 
   it('outputs a valid JSON config object matching the defined rule structure', async () => {
@@ -136,6 +139,27 @@ describe('IncentiveBuilder', () => {
     ];
     render(<IncentiveBuilder {...defaultProps} rules={rules} />);
     const exportButton = screen.getByRole('button', { name: /export json/i });
-    expect(exportButton).toBeDisabled();
+    // Clicking export with missing reward triggers validation
+    await userEvent.click(exportButton);
+    expect(screen.getByTestId('validation-errors')).toBeInTheDocument();
+    expect(screen.getByText(/missing required fields/i)).toBeInTheDocument();
+  });
+
+  it('shows validation error messages when export is attempted with incomplete rules', async () => {
+    const rules = [
+      {
+        id: 'rule-1',
+        trigger: '',
+        condition: '',
+        reward: '',
+        type: 'threshold' as const,
+      },
+    ];
+    render(<IncentiveBuilder {...defaultProps} rules={rules} />);
+    // Click the export button to trigger validation display
+    const exportButton = screen.getByRole('button', { name: /export json/i });
+    await userEvent.click(exportButton);
+    // Should show validation errors
+    expect(screen.getByTestId('validation-errors')).toBeInTheDocument();
   });
 });
