@@ -93,8 +93,9 @@ function RuleRow({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Type</label>
+          <label htmlFor={`rule-${index}-type`} className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Type</label>
           <select
+            id={`rule-${index}-type`}
             value={rule.type}
             onChange={(e) => handleChange('type', e.target.value as IncentiveType)}
             className="input-base"
@@ -105,8 +106,9 @@ function RuleRow({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Trigger</label>
+          <label htmlFor={`rule-${index}-trigger`} className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Trigger</label>
           <select
+            id={`rule-${index}-trigger`}
             value={rule.trigger}
             onChange={(e) => handleChange('trigger', e.target.value)}
             className={`input-base ${showErrors && !rule.trigger ? 'border-red-500/50 ring-1 ring-red-500/20' : ''}`}
@@ -120,8 +122,9 @@ function RuleRow({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Condition</label>
+          <label htmlFor={`rule-${index}-condition`} className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Condition</label>
           <select
+            id={`rule-${index}-condition`}
             value={rule.condition}
             onChange={(e) => handleChange('condition', e.target.value)}
             className={`input-base ${showErrors && !rule.condition ? 'border-red-500/50 ring-1 ring-red-500/20' : ''}`}
@@ -135,8 +138,9 @@ function RuleRow({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Reward</label>
+          <label htmlFor={`rule-${index}-reward`} className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Reward</label>
           <input
+            id={`rule-${index}-reward`}
             type="text"
             value={rule.reward}
             onChange={(e) => handleChange('reward', e.target.value)}

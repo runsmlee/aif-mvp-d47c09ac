@@ -3,7 +3,7 @@ import type { ViralTemplate, TemplateParams, IncentiveRule, AppView } from './ty
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { mockAnalyticsData } from './data/mockAnalytics';
 import { templates } from './data/templates';
-import { LivePreview } from './components/LivePreview';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const SnippetGenerator = lazy(() =>
   import('./components/SnippetGenerator').then((m) => ({ default: m.SnippetGenerator }))
@@ -16,6 +16,9 @@ const IncentiveBuilder = lazy(() =>
 );
 const TemplateLibrary = lazy(() =>
   import('./components/TemplateLibrary').then((m) => ({ default: m.TemplateLibrary }))
+);
+const LivePreview = lazy(() =>
+  import('./components/LivePreview').then((m) => ({ default: m.LivePreview }))
 );
 
 type NavItem = {
@@ -160,41 +163,51 @@ export function App() {
     switch (activeView) {
       case 'generator':
         return (
-          <Suspense fallback={<LoadingFallback />}>
+          <ErrorBoundary>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SnippetGenerator
-                selectedTemplate={selectedTemplate}
-                params={params}
-                onParamsChange={handleParamsChange}
-                onTemplateSelect={handleTemplateSelect}
-              />
-              <LivePreview loopType={loopType} params={params} />
+              <Suspense fallback={<LoadingFallback />}>
+                <SnippetGenerator
+                  selectedTemplate={selectedTemplate}
+                  params={params}
+                  onParamsChange={handleParamsChange}
+                  onTemplateSelect={handleTemplateSelect}
+                />
+              </Suspense>
+              <Suspense fallback={<LoadingFallback />}>
+                <LivePreview loopType={loopType} params={params} />
+              </Suspense>
             </div>
-          </Suspense>
+          </ErrorBoundary>
         );
       case 'analytics':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <KFactorDashboard data={mockAnalyticsData} />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingFallback />}>
+              <KFactorDashboard data={mockAnalyticsData} />
+            </Suspense>
+          </ErrorBoundary>
         );
       case 'builder':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <IncentiveBuilder
-              rules={incentiveRules}
-              onRulesChange={setIncentiveRules}
-            />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingFallback />}>
+              <IncentiveBuilder
+                rules={incentiveRules}
+                onRulesChange={setIncentiveRules}
+              />
+            </Suspense>
+          </ErrorBoundary>
         );
       case 'templates':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <TemplateLibrary
-              onSelectTemplate={handleTemplateSelect}
-              activeTemplateId={selectedTemplate?.id ?? null}
-            />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingFallback />}>
+              <TemplateLibrary
+                onSelectTemplate={handleTemplateSelect}
+                activeTemplateId={selectedTemplate?.id ?? null}
+              />
+            </Suspense>
+          </ErrorBoundary>
         );
       default:
         return null;
