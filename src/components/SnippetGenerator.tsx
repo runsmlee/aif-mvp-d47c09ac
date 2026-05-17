@@ -251,8 +251,9 @@ export function SnippetGenerator({
           {/* Parameter fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2 flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Loop Name</label>
+              <label htmlFor="param-loop-name" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Loop Name</label>
               <input
+                id="param-loop-name"
                 type="text"
                 value={params.loopName}
                 onChange={(e) =>
@@ -263,8 +264,9 @@ export function SnippetGenerator({
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Incentive Type</label>
+              <label htmlFor="param-incentive-type" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Incentive Type</label>
               <select
+                id="param-incentive-type"
                 value={params.incentiveType}
                 onChange={(e) =>
                   handleParamChange('incentiveType', e.target.value)
@@ -277,8 +279,9 @@ export function SnippetGenerator({
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Threshold</label>
+              <label htmlFor="param-threshold" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Threshold</label>
               <input
+                id="param-threshold"
                 type="number"
                 min={1}
                 value={params.threshold}
@@ -289,8 +292,9 @@ export function SnippetGenerator({
               />
             </div>
             <div className="sm:col-span-2 flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-gray-400 uppercase tracking-wider">Reward</label>
+              <label htmlFor="param-reward" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Reward</label>
               <input
+                id="param-reward"
                 type="text"
                 value={params.reward}
                 onChange={(e) =>

@@ -31,8 +31,8 @@ function ReferralPreview({ params }: { params: TemplateParams }) {
         <p className="text-xs text-gray-400 mt-1.5">Reward: <span className="text-white font-medium">{params.reward}</span></p>
       </div>
       <div className="flex gap-2">
-        <button className="flex-1 btn-primary text-sm">Share Link</button>
-        <button className="flex-1 btn-secondary text-sm">Copy Link</button>
+        <button className="flex-1 btn-primary text-sm" aria-label="Share referral link">Share Link</button>
+        <button className="flex-1 btn-secondary text-sm" aria-label="Copy referral link">Copy Link</button>
       </div>
     </div>
   );

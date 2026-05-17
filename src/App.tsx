@@ -1,9 +1,11 @@
 import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import type { ViralTemplate, TemplateParams, IncentiveRule, AppView } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { mockAnalyticsData } from './data/mockAnalytics';
 import { templates } from './data/templates';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { SkeletonCard, SkeletonCodeBlock, SkeletonForm, SkeletonMetricCards } from './components/Skeleton';
 
 const SnippetGenerator = lazy(() =>
   import('./components/SnippetGenerator').then((m) => ({ default: m.SnippetGenerator }))
@@ -25,13 +27,14 @@ type NavItem = {
   id: AppView;
   label: string;
   icon: string;
+  shortcut: string;
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'generator', label: 'Generator', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
-  { id: 'analytics', label: 'Analytics', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
-  { id: 'builder', label: 'Builder', icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4' },
-  { id: 'templates', label: 'Templates', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
+  { id: 'generator', label: 'Generator', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4', shortcut: '⌘1' },
+  { id: 'analytics', label: 'Analytics', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', shortcut: '⌘2' },
+  { id: 'builder', label: 'Builder', icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4', shortcut: '⌘3' },
+  { id: 'templates', label: 'Templates', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', shortcut: '⌘4' },
 ];
 
 function Sidebar({
@@ -62,10 +65,11 @@ function Sidebar({
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4" aria-label="Main navigation">
-        <ul className="flex flex-col gap-1">
+        <ul className="flex flex-col gap-1" role="menubar">
           {NAV_ITEMS.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} role="none">
               <button
+                role="menuitem"
                 onClick={() => onNavigate(item.id)}
                 className={`w-full text-left ${
                   activeView === item.id ? 'nav-link-active' : 'nav-link'
@@ -87,6 +91,7 @@ function Sidebar({
                   />
                 </svg>
                 {item.label}
+                <span className="ml-auto text-[10px] text-gray-600 font-mono hidden lg:inline">{item.shortcut}</span>
               </button>
             </li>
           ))}
@@ -97,10 +102,67 @@ function Sidebar({
       <div className="px-5 py-4 border-t border-gray-800/60">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-          <p className="text-[11px] text-gray-500 font-mono">v1.1.0</p>
+          <p className="text-[11px] text-gray-500 font-mono">v1.2.0</p>
         </div>
       </div>
     </aside>
+  );
+}
+
+/** Skeleton fallbacks for each view */
+function GeneratorSkeleton() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="flex flex-col gap-5">
+        <SkeletonForm />
+      </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <SkeletonCard />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsSkeleton() {
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center justify-between">
+        <div className="h-5 w-40 animate-pulse bg-gray-800/60 rounded" />
+      </div>
+      <SkeletonMetricCards />
+      <SkeletonCard />
+    </div>
+  );
+}
+
+function BuilderSkeleton() {
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center justify-between">
+        <div className="h-5 w-48 animate-pulse bg-gray-800/60 rounded" />
+      </div>
+      <SkeletonCard />
+    </div>
+  );
+}
+
+function TemplatesSkeleton() {
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="h-5 w-40 animate-pulse bg-gray-800/60 rounded" />
+      <div className="flex flex-wrap gap-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-9 w-20 animate-pulse bg-gray-800/60 rounded-lg" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -116,6 +178,9 @@ export function App() {
     null
   );
   const [incentiveRules, setIncentiveRules] = useState<IncentiveRule[]>([]);
+
+  // Enable keyboard shortcuts
+  useKeyboardShortcuts(setActiveView);
 
   // Restore selected template from localStorage on mount
   useEffect(() => {
@@ -148,16 +213,15 @@ export function App() {
 
   const loopType = selectedTemplate?.category ?? null;
 
-  function LoadingFallback() {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
-          <p className="text-xs text-gray-500 font-medium">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  const getSkeletonForView = (view: AppView) => {
+    switch (view) {
+      case 'generator': return <GeneratorSkeleton />;
+      case 'analytics': return <AnalyticsSkeleton />;
+      case 'builder': return <BuilderSkeleton />;
+      case 'templates': return <TemplatesSkeleton />;
+      default: return <SkeletonCard />;
+    }
+  };
 
   const renderContent = () => {
     switch (activeView) {
@@ -165,7 +229,7 @@ export function App() {
         return (
           <ErrorBoundary>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Suspense fallback={<LoadingFallback />}>
+              <Suspense fallback={<GeneratorSkeleton />}>
                 <SnippetGenerator
                   selectedTemplate={selectedTemplate}
                   params={params}
@@ -173,7 +237,7 @@ export function App() {
                   onTemplateSelect={handleTemplateSelect}
                 />
               </Suspense>
-              <Suspense fallback={<LoadingFallback />}>
+              <Suspense fallback={<SkeletonCodeBlock />}>
                 <LivePreview loopType={loopType} params={params} />
               </Suspense>
             </div>
@@ -182,7 +246,7 @@ export function App() {
       case 'analytics':
         return (
           <ErrorBoundary>
-            <Suspense fallback={<LoadingFallback />}>
+            <Suspense fallback={<AnalyticsSkeleton />}>
               <KFactorDashboard data={mockAnalyticsData} />
             </Suspense>
           </ErrorBoundary>
@@ -190,7 +254,7 @@ export function App() {
       case 'builder':
         return (
           <ErrorBoundary>
-            <Suspense fallback={<LoadingFallback />}>
+            <Suspense fallback={<BuilderSkeleton />}>
               <IncentiveBuilder
                 rules={incentiveRules}
                 onRulesChange={setIncentiveRules}
@@ -201,7 +265,7 @@ export function App() {
       case 'templates':
         return (
           <ErrorBoundary>
-            <Suspense fallback={<LoadingFallback />}>
+            <Suspense fallback={<TemplatesSkeleton />}>
               <TemplateLibrary
                 onSelectTemplate={handleTemplateSelect}
                 activeTemplateId={selectedTemplate?.id ?? null}
@@ -218,7 +282,7 @@ export function App() {
     <div className="flex min-h-screen bg-gray-950">
       <Sidebar activeView={activeView} onNavigate={setActiveView} />
 
-      {/* Mobile top bar — primary navigation on mobile, hidden on desktop where sidebar takes over */}
+      {/* Mobile top bar — primary navigation on mobile */}
       <div className="md:hidden fixed top-0 inset-x-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800/60">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2" aria-hidden="true">
@@ -251,7 +315,12 @@ export function App() {
         </div>
       </div>
 
-      <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto pt-16 md:pt-6">
+      <main
+        className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto pt-16 md:pt-6"
+        id="main-content"
+        role="main"
+        aria-label={`${activeView.charAt(0).toUpperCase() + activeView.slice(1)} view`}
+      >
         <div className="max-w-6xl mx-auto">{renderContent()}</div>
       </main>
     </div>

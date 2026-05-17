@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import type { AnalyticsData } from '../types';
 
 interface KFactorDashboardProps {
@@ -49,6 +49,8 @@ function MetricCard({
 }
 
 function TrendChart({ data }: { data: AnalyticsData['trend'] }) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   if (data.length === 0) return null;
 
   const maxValue = Math.max(...data.map((d) => d.value));
@@ -67,6 +69,15 @@ function TrendChart({ data }: { data: AnalyticsData['trend'] }) {
 
   const areaPoints = `10,${chartHeight} ${points} ${(data.length - 1) * 20 + 10},${chartHeight}`;
 
+  const getY = (index: number): number => {
+    const d = data[index];
+    return chartHeight - ((d.value - minValue) / range) * (chartHeight - 20) - 10;
+  };
+
+  const getX = (index: number): number => {
+    return index * 20 + 10;
+  };
+
   return (
     <div data-testid="trend-chart" className="mt-2">
       <div className="flex items-center justify-between mb-3">
@@ -76,57 +87,110 @@ function TrendChart({ data }: { data: AnalyticsData['trend'] }) {
         <span className="text-[11px] text-gray-500 font-medium">Last 30 days</span>
       </div>
       <div className="bg-gray-900/60 rounded-xl border border-gray-800/60 p-4 overflow-x-auto">
-        <svg
-          width={chartWidth}
-          height={chartHeight}
-          viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-          className="w-full"
-          role="img"
-          aria-label="K-Factor trend chart over 30 days"
-        >
-          {/* K=1 reference line */}
-          {(() => {
-            const k1Y =
-              chartHeight -
-              ((1 - minValue) / range) * (chartHeight - 20) -
-              10;
-            if (k1Y > 0 && k1Y < chartHeight) {
-              return (
-                <line
-                  x1="0"
-                  y1={k1Y}
-                  x2={chartWidth}
-                  y2={k1Y}
-                  stroke="#EF4444"
-                  strokeDasharray="4,4"
-                  opacity="0.4"
+        <div className="relative">
+          <svg
+            width={chartWidth}
+            height={chartHeight}
+            viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+            className="w-full"
+            role="img"
+            aria-label="K-Factor trend chart over 30 days"
+          >
+            {/* K=1 reference line */}
+            {(() => {
+              const k1Y =
+                chartHeight -
+                ((1 - minValue) / range) * (chartHeight - 20) -
+                10;
+              if (k1Y > 0 && k1Y < chartHeight) {
+                return (
+                  <line
+                    x1="0"
+                    y1={k1Y}
+                    x2={chartWidth}
+                    y2={k1Y}
+                    stroke="#EF4444"
+                    strokeDasharray="4,4"
+                    opacity="0.4"
+                  />
+                );
+              }
+              return null;
+            })()}
+            {/* Area fill */}
+            <polygon
+              points={areaPoints}
+              fill="url(#areaGradient)"
+              opacity="0.3"
+            />
+            {/* Line */}
+            <polyline
+              points={points}
+              fill="none"
+              stroke="#EF4444"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {/* Hover hit areas */}
+            {data.map((d, i) => (
+              <circle
+                key={d.date}
+                cx={getX(i)}
+                cy={getY(i)}
+                r={8}
+                fill="transparent"
+                onMouseEnter={() => setHoveredIndex(i)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                className="cursor-crosshair"
+              />
+            ))}
+            {/* Hovered data point highlight */}
+            {hoveredIndex !== null && (
+              <>
+                <circle
+                  cx={getX(hoveredIndex)}
+                  cy={getY(hoveredIndex)}
+                  r={4}
+                  fill="#EF4444"
+                  stroke="white"
+                  strokeWidth={2}
                 />
-              );
-            }
-            return null;
-          })()}
-          {/* Area fill */}
-          <polygon
-            points={areaPoints}
-            fill="url(#areaGradient)"
-            opacity="0.3"
-          />
-          {/* Line */}
-          <polyline
-            points={points}
-            fill="none"
-            stroke="#EF4444"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <defs>
-            <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#EF4444" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#EF4444" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-        </svg>
+                <line
+                  x1={getX(hoveredIndex)}
+                  y1={getY(hoveredIndex) + 4}
+                  x2={getX(hoveredIndex)}
+                  y2={chartHeight}
+                  stroke="#EF4444"
+                  strokeDasharray="2,2"
+                  opacity="0.3"
+                />
+              </>
+            )}
+            <defs>
+              <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#EF4444" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#EF4444" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+          </svg>
+          {/* Tooltip overlay */}
+          {hoveredIndex !== null && (
+            <div
+              className="absolute pointer-events-none bg-gray-800 border border-gray-700/60 rounded-lg px-3 py-2 shadow-lg z-10 text-xs"
+              style={{
+                left: `${(getX(hoveredIndex) / chartWidth) * 100}%`,
+                top: `${(getY(hoveredIndex) / chartHeight) * 100 - 8}%`,
+                transform: 'translate(-50%, -100%)',
+              }}
+            >
+              <p className="text-gray-400 font-mono">{data[hoveredIndex].date}</p>
+              <p className="text-white font-bold font-mono">
+                K = {data[hoveredIndex].value.toFixed(2)}
+              </p>
+            </div>
+          )}
+        </div>
         <div className="flex justify-between text-[11px] text-gray-600 mt-2 font-mono">
           <span>{data[0]?.date}</span>
           <span>{data[data.length - 1]?.date}</span>

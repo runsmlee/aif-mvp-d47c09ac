@@ -87,3 +87,17 @@
 - [x] Added user journey integration tests (Primary Workflow + Analytics Workflow)
 - [x] Split React into separate vendor chunk for better browser caching
 - [x] Improved form accessibility in IncentiveBuilder (label htmlFor associations)
+
+## Improvement Iteration (v1.2.1)
+- [x] Replaced loading spinner with skeleton screens for all Suspense boundaries
+- [x] Added Skeleton components: SkeletonCard, SkeletonCodeBlock, SkeletonForm, SkeletonMetricCards
+- [x] Added keyboard shortcuts hook (Cmd/Ctrl+1-4 for navigation) — dev-first per PRD
+- [x] Added shortcut hints in sidebar navigation (visible on lg screens)
+- [x] Improved SnippetGenerator form accessibility (htmlFor/id on all inputs)
+- [x] Added interactive chart hover tooltips on KFactorDashboard trend chart
+- [x] Improved ARIA labels on LivePreview interactive buttons
+- [x] Added main content landmark role with dynamic aria-label
+- [x] Added menubar/menuitem ARIA roles to sidebar navigation
+- [x] Version bump to v1.2.0
+- [x] Added SkeletonLoading.test.tsx (5 tests) and KeyboardShortcuts.test.tsx (7 tests)
+- [x] Overall test coverage: 93.84% statements, 91.07% branches
