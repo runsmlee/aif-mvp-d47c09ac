@@ -58,7 +58,7 @@ function Sidebar({
             <h1 className="text-base font-bold text-white tracking-tight leading-none">
               <span className="text-brand-500">Loop</span>Engine
             </h1>
-            <p className="text-[10px] text-gray-500 mt-0.5 font-medium tracking-wide uppercase">Engineer Your Virality</p>
+            <p className="text-xs text-gray-400 mt-0.5 font-medium tracking-wide uppercase">Engineer Your Virality</p>
           </div>
         </div>
       </div>
@@ -91,7 +91,7 @@ function Sidebar({
                   />
                 </svg>
                 {item.label}
-                <span className="ml-auto text-[10px] text-gray-600 font-mono hidden lg:inline">{item.shortcut}</span>
+                <span className="ml-auto text-xs text-gray-500 font-mono hidden lg:inline">{item.shortcut}</span>
               </button>
             </li>
           ))}
@@ -102,7 +102,7 @@ function Sidebar({
       <div className="px-5 py-4 border-t border-gray-800/60">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-          <p className="text-[11px] text-gray-500 font-mono">v1.2.0</p>
+          <p className="text-xs text-gray-400 font-mono">v1.2.0</p>
         </div>
       </div>
     </aside>

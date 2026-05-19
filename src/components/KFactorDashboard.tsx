@@ -32,7 +32,7 @@ function MetricCard({
           {value}
         </p>
         {badge && (
-          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+          <span className={`text-xs px-1.5 py-0.5 rounded font-bold ${
             badge === 'HIGH'
               ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
               : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
@@ -109,7 +109,7 @@ function TrendChart({ data }: { data: AnalyticsData['trend'] }) {
                     y1={k1Y}
                     x2={chartWidth}
                     y2={k1Y}
-                    stroke="#EF4444"
+                    stroke="#B91C1C"
                     strokeDasharray="4,4"
                     opacity="0.4"
                   />
@@ -127,7 +127,7 @@ function TrendChart({ data }: { data: AnalyticsData['trend'] }) {
             <polyline
               points={points}
               fill="none"
-              stroke="#EF4444"
+              stroke="#B91C1C"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -152,7 +152,7 @@ function TrendChart({ data }: { data: AnalyticsData['trend'] }) {
                   cx={getX(hoveredIndex)}
                   cy={getY(hoveredIndex)}
                   r={4}
-                  fill="#EF4444"
+                  fill="#B91C1C"
                   stroke="white"
                   strokeWidth={2}
                 />
@@ -161,7 +161,7 @@ function TrendChart({ data }: { data: AnalyticsData['trend'] }) {
                   y1={getY(hoveredIndex) + 4}
                   x2={getX(hoveredIndex)}
                   y2={chartHeight}
-                  stroke="#EF4444"
+                  stroke="#B91C1C"
                   strokeDasharray="2,2"
                   opacity="0.3"
                 />
@@ -169,8 +169,8 @@ function TrendChart({ data }: { data: AnalyticsData['trend'] }) {
             )}
             <defs>
               <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#EF4444" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="#EF4444" stopOpacity="0" />
+                <stop offset="0%" stopColor="#B91C1C" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#B91C1C" stopOpacity="0" />
               </linearGradient>
             </defs>
           </svg>
@@ -291,9 +291,9 @@ export function KFactorDashboard({ data }: KFactorDashboardProps) {
 
           <TrendChart data={data.trend} />
 
-          <div className="flex items-center gap-2.5 text-xs text-gray-500 mt-1">
+          <div className="flex items-center gap-2.5 text-xs text-gray-400 mt-1">
             <div className="flex items-center gap-1.5">
-              <div className="w-4 h-0.5 bg-brand-500/40 rounded-full" style={{ borderTop: '2px dashed rgba(239,68,68,0.4)' }} />
+              <div className="w-4 h-0.5 bg-brand-500/40 rounded-full" style={{ borderTop: '2px dashed rgba(185,28,28,0.4)' }} />
             </div>
             <span>K = 1 — exponential growth threshold</span>
           </div>

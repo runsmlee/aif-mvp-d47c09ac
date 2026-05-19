@@ -15,18 +15,18 @@ function ReferralPreview({ params }: { params: TemplateParams }) {
           </svg>
         </div>
         <h3 className="text-white font-semibold text-sm">Refer a Friend</h3>
-        <p className="text-gray-500 text-xs mt-1">
+        <p className="text-gray-400 text-xs mt-1">
           Share your unique link and earn rewards
         </p>
       </div>
       <div className="bg-gray-800/50 rounded-lg p-3 ring-1 ring-gray-700/40">
-        <div className="text-[11px] text-gray-500 font-medium uppercase tracking-wider mb-1.5">Your referral link</div>
+        <div className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1.5">Your referral link</div>
         <code className="text-emerald-400 text-xs font-mono block truncate">
           https://yourapp.com/ref/{params.loopName}
         </code>
       </div>
       <div className="bg-gray-800/50 rounded-lg p-4 text-center ring-1 ring-gray-700/40">
-        <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wider mb-1">Referrals needed</p>
+        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Referrals needed</p>
         <p className="text-3xl font-bold text-brand-400 font-mono tracking-tight">{params.threshold}</p>
         <p className="text-xs text-gray-400 mt-1.5">Reward: <span className="text-white font-medium">{params.reward}</span></p>
       </div>
@@ -51,19 +51,19 @@ function WaitlistPreview({ params }: { params: TemplateParams }) {
           </svg>
         </div>
         <h3 className="text-white font-semibold text-sm">Waitlist Position</h3>
-        <p className="text-gray-500 text-xs mt-1">
+        <p className="text-gray-400 text-xs mt-1">
           Refer friends to move up the waitlist
         </p>
       </div>
       <div className="bg-gray-800/50 rounded-lg p-4 text-center ring-1 ring-gray-700/40">
-        <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wider mb-2">Your position</p>
+        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Your position</p>
         <p className="text-4xl font-bold text-blue-400 font-mono tracking-tight">#{position}</p>
         <div className="mt-2 text-xs text-emerald-400 font-medium">
           ↓ Refer {params.threshold} friend{params.threshold > 1 ? 's' : ''} → <span className="text-white">#{newPosition}</span>
         </div>
       </div>
       <div className="bg-gray-800/50 rounded-lg p-3 ring-1 ring-gray-700/40">
-        <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wider mb-1.5">Your reward</p>
+        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1.5">Your reward</p>
         <p className="text-sm text-white font-medium">{params.reward}</p>
       </div>
     </div>
@@ -94,7 +94,7 @@ function TieredPreview({ params }: { params: TemplateParams }) {
           </svg>
         </div>
         <h3 className="text-white font-semibold text-sm">Milestone Rewards</h3>
-        <p className="text-gray-500 text-xs mt-1">
+        <p className="text-gray-400 text-xs mt-1">
           Unlock rewards at each milestone
         </p>
       </div>
@@ -121,7 +121,7 @@ function TieredPreview({ params }: { params: TemplateParams }) {
               <p className={`text-sm font-medium truncate ${m.achieved ? 'text-emerald-400' : 'text-gray-300'}`}>
                 {m.label}
               </p>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-xs text-gray-400">
                 {m.threshold} referral{m.threshold > 1 ? 's' : ''}
               </p>
             </div>
@@ -136,10 +136,10 @@ export function LivePreview({ loopType, params }: LivePreviewProps) {
   const renderPreview = () => {
     if (!loopType || !params) {
       return (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-400">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-800/50 flex items-center justify-center">
             <svg
-              className="w-8 h-8 text-gray-600"
+              className="w-8 h-8 text-gray-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -182,7 +182,7 @@ export function LivePreview({ loopType, params }: LivePreviewProps) {
     <div className="flex flex-col gap-4">
       <div>
         <h2 className="text-lg font-semibold text-white tracking-tight">Live Preview</h2>
-        <p className="text-xs text-gray-500 mt-0.5">See how your viral loop will look to users</p>
+        <p className="text-xs text-gray-400 mt-0.5">See how your viral loop will look to users</p>
       </div>
       <div className="metric-card min-h-[300px]">
         {/* Browser chrome */}
@@ -192,7 +192,7 @@ export function LivePreview({ loopType, params }: LivePreviewProps) {
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
             <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
           </div>
-          <div className="flex-1 bg-gray-800/60 rounded-md px-3 py-1 text-[11px] text-gray-500 font-mono">
+          <div className="flex-1 bg-gray-800/60 rounded-md px-3 py-1 text-xs text-gray-400 font-mono">
             yourapp.com/loop-preview
           </div>
         </div>

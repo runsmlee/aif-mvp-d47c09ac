@@ -70,7 +70,7 @@ function RuleRow({
         </div>
         <button
           onClick={() => onRemove(index)}
-          className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+          className="p-1.5 rounded-lg text-red-300 hover:text-red-200 hover:bg-red-500/10 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
           aria-label="Delete rule"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -93,7 +93,7 @@ function RuleRow({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor={`rule-${index}-type`} className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Type</label>
+          <label htmlFor={`rule-${index}-type`} className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Type</label>
           <select
             id={`rule-${index}-type`}
             value={rule.type}
@@ -106,7 +106,7 @@ function RuleRow({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor={`rule-${index}-trigger`} className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Trigger</label>
+          <label htmlFor={`rule-${index}-trigger`} className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Trigger</label>
           <select
             id={`rule-${index}-trigger`}
             value={rule.trigger}
@@ -122,7 +122,7 @@ function RuleRow({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor={`rule-${index}-condition`} className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Condition</label>
+          <label htmlFor={`rule-${index}-condition`} className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Condition</label>
           <select
             id={`rule-${index}-condition`}
             value={rule.condition}
@@ -138,7 +138,7 @@ function RuleRow({
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor={`rule-${index}-reward`} className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Reward</label>
+          <label htmlFor={`rule-${index}-reward`} className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Reward</label>
           <input
             id={`rule-${index}-reward`}
             type="text"
@@ -215,7 +215,7 @@ export function IncentiveBuilder({
           <h2 className="text-lg font-semibold text-white tracking-tight">
             Incentive Logic Builder
           </h2>
-          <p className="text-xs text-gray-500 mt-0.5">Define rules that trigger rewards for user actions</p>
+          <p className="text-xs text-gray-400 mt-0.5">Define rules that trigger rewards for user actions</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -243,10 +243,10 @@ export function IncentiveBuilder({
       </div>
 
       {rules.length === 0 ? (
-        <div className="metric-card text-center py-16 text-gray-500">
+        <div className="metric-card text-center py-16 text-gray-400">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-800/50 flex items-center justify-center">
             <svg
-              className="w-8 h-8 text-gray-600"
+              className="w-8 h-8 text-gray-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -256,7 +256,7 @@ export function IncentiveBuilder({
             </svg>
           </div>
           <p className="text-sm font-medium text-gray-400">No rules defined yet</p>
-          <p className="text-xs text-gray-600 mt-1 mb-4">Click "Add Rule" to start building your incentive logic</p>
+          <p className="text-xs text-gray-400 mt-1 mb-4">Click "Add Rule" to start building your incentive logic</p>
           <button
             onClick={handleAddRule}
             className="btn-primary text-sm mx-auto"
