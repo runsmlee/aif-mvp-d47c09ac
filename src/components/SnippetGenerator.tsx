@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState, useEffect, createElement as h, Fragment } from 'react';
 import type { ViralTemplate, TemplateParams } from '../types';
 import { templates } from '../data/templates';
 
@@ -8,6 +8,117 @@ interface SnippetGeneratorProps {
   onParamsChange: (params: TemplateParams) => void;
   onTemplateSelect: (template: ViralTemplate) => void;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Hero quickstart snippet — shown when no template is selected      */
+/* ------------------------------------------------------------------ */
+
+const HERO_SNIPPET = `// ViralKit — viralkit.dev
+import { ViralKit } from '@viralkit/sdk';
+
+const loop = ViralKit.createLoop({
+  name: 'my-referral-loop',
+  type: 'threshold',
+  config: {
+    threshold: 3,
+    reward: 'Unlock Pro tier',
+    onReward: (user) => {
+      console.log(\`User \${user.id} earned reward: Unlock Pro tier\`);
+    },
+  },
+});
+
+export default function ReferralWidget() {
+  return (
+    <loop.Provider>
+      <loop.ShareLink />
+      <loop.ReferralCounter />
+    </loop.Provider>
+  );
+}`;
+
+/** Lightweight syntax highlighter — no external deps */
+const KEYWORDS = new Set([
+  'import', 'from', 'const', 'export', 'default', 'function', 'return',
+  'typeof', 'new', 'let', 'var', 'if', 'else', 'async', 'await',
+]);
+
+const JSX_TAGS = new Set([
+  'loop.Provider', 'loop.ShareLink', 'loop.ReferralCounter',
+]);
+
+function highlightTokens(code: string): React.ReactNode[] {
+  const lines = code.split('\n');
+  const nodes: React.ReactNode[] = [];
+
+  for (let li = 0; li < lines.length; li++) {
+    if (li > 0) nodes.push('\n');
+    const line = lines[li];
+
+    // Comment line
+    if (line.trimStart().startsWith('//')) {
+      nodes.push(
+        h('span', { key: `c-${li}`, className: 'text-gray-500 italic' }, line)
+      );
+      continue;
+    }
+
+    // Tokenize the line using a simple regex approach
+    const tokenRe = /\/\/.*$|'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*`|[a-zA-Z_$][\w.$]*|[{}()<>=;,\[\]]|[^\s]/g;
+    let match: RegExpExecArray | null;
+    let keyIdx = 0;
+
+    while ((match = tokenRe.exec(line)) !== null) {
+      const token = match[0];
+      const k = `t-${li}-${keyIdx++}`;
+
+      // Inline comment
+      if (token.startsWith('//')) {
+        nodes.push(h('span', { key: k, className: 'text-gray-500 italic' }, token));
+        continue;
+      }
+
+      // String
+      if (token.startsWith("'") || token.startsWith('"') || token.startsWith('`')) {
+        nodes.push(h('span', { key: k, className: 'text-emerald-400' }, token));
+        continue;
+      }
+
+      // JSX tag
+      if (JSX_TAGS.has(token)) {
+        nodes.push(h('span', { key: k, className: 'text-sky-400' }, token));
+        continue;
+      }
+
+      // Keyword
+      if (KEYWORDS.has(token)) {
+        nodes.push(h('span', { key: k, className: 'text-violet-400 font-semibold' }, token));
+        continue;
+      }
+
+      // Number
+      if (/^\d+$/.test(token)) {
+        nodes.push(h('span', { key: k, className: 'text-amber-300' }, token));
+        continue;
+      }
+
+      // Bracket / punctuation
+      if ('{}()[];=<>,'.includes(token)) {
+        nodes.push(h('span', { key: k, className: 'text-gray-400' }, token));
+        continue;
+      }
+
+      // Default — identifier
+      nodes.push(h('span', { key: k, className: 'text-gray-200' }, token));
+    }
+  }
+
+  return nodes;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Template-specific code generator                                  */
+/* ------------------------------------------------------------------ */
 
 function generateCode(
   template: ViralTemplate | null,
@@ -161,6 +272,93 @@ export default function EarlyAccessWidget() {
   return templatesMap[template.id] || templatesMap['referral-link'] || '';
 }
 
+/* ------------------------------------------------------------------ */
+/*  Hero Code Panel — first thing developers see                      */
+/* ------------------------------------------------------------------ */
+
+function HeroCodePanel() {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(HERO_SNIPPET).then(() => {
+      setCopied(true);
+      // Track the copy event
+      window.aif?.track('hero_copy', { snippet: 'quickstart' });
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
+  const highlighted = useMemo(() => highlightTokens(HERO_SNIPPET), []);
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Full-width code panel — ~70% of viewport */}
+      <div
+        className="relative group code-panel p-5 sm:p-6 lg:p-8 overflow-x-auto"
+        style={{ minHeight: 'clamp(280px, 70vh, 560px)' }}
+        data-testid="hero-code-panel"
+      >
+        {/* File tab bar */}
+        <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-800/60">
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
+            </div>
+            <span className="text-xs text-gray-500 font-mono">ReferralWidget.tsx</span>
+          </div>
+          {/* Prominent copy button — always visible */}
+          <button
+            onClick={handleCopy}
+            className="btn-primary text-sm px-5 py-2.5 gap-2"
+            aria-label="Copy quickstart code snippet"
+            data-testid="hero-copy-button"
+          >
+            {copied ? (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Copied!
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Copy
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Syntax-highlighted code */}
+        <pre
+          data-testid="code-output"
+          className="text-xs sm:text-sm lg:text-base leading-relaxed sm:leading-relaxed lg:leading-loose font-mono"
+        >
+          <code>{highlighted}</code>
+        </pre>
+      </div>
+
+      {/* Single-line value prop */}
+      <p className="text-center text-sm text-gray-400 font-medium">
+        Embed viral loops in minutes. Copy, paste, ship.
+      </p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main SnippetGenerator Component                                   */
+/* ------------------------------------------------------------------ */
+
 export function SnippetGenerator({
   selectedTemplate,
   params,
@@ -175,8 +373,9 @@ export function SnippetGenerator({
   const handleCopy = useCallback(() => {
     if (code) {
       navigator.clipboard.writeText(code);
+      window.aif?.track('snippet_copy', { template: selectedTemplate?.id });
     }
-  }, [code]);
+  }, [code, selectedTemplate]);
 
   const handleDownload = useCallback(() => {
     if (!code || !selectedTemplate) return;
@@ -212,6 +411,43 @@ export function SnippetGenerator({
     [params, onParamsChange]
   );
 
+  /* ---- No template selected: show hero code panel ---- */
+  if (!selectedTemplate || !params) {
+    return (
+      <div className="flex flex-col gap-6">
+        {/* Small label for test compatibility */}
+        <h2 className="text-lg font-semibold text-white tracking-tight">Snippet Generator</h2>
+
+        <HeroCodePanel />
+
+        {/* Template selector below the code panel */}
+        <div className="flex flex-col gap-2">
+          <label
+            htmlFor="template-select"
+            className="text-sm font-medium text-gray-300"
+          >
+            Configure a template
+          </label>
+          <select
+            id="template-select"
+            aria-label="Select a template"
+            value=""
+            onChange={handleTemplateChange}
+            className="input-base max-w-md"
+          >
+            <option value="">Choose a template...</option>
+            {templates.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    );
+  }
+
+  /* ---- Template selected: show configuration mode ---- */
   return (
     <div className="flex flex-col gap-5">
       {/* Header */}
@@ -233,7 +469,7 @@ export function SnippetGenerator({
         <select
           id="template-select"
           aria-label="Select a template"
-          value={selectedTemplate?.id ?? ''}
+          value={selectedTemplate.id}
           onChange={handleTemplateChange}
           className="input-base"
         >
@@ -246,144 +482,99 @@ export function SnippetGenerator({
         </select>
       </div>
 
-      {selectedTemplate && params ? (
-        <div className="flex flex-col gap-4">
-          {/* Parameter fields */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2 flex flex-col gap-1.5">
-              <label htmlFor="param-loop-name" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Loop Name</label>
-              <input
-                id="param-loop-name"
-                type="text"
-                value={params.loopName}
-                onChange={(e) =>
-                  handleParamChange('loopName', e.target.value)
-                }
-                className="input-base"
-                placeholder="e.g. my-referral-loop"
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="param-incentive-type" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Incentive Type</label>
-              <select
-                id="param-incentive-type"
-                value={params.incentiveType}
-                onChange={(e) =>
-                  handleParamChange('incentiveType', e.target.value)
-                }
-                className="input-base"
-              >
-                <option value="threshold">Threshold</option>
-                <option value="waitlist_position">Waitlist Position</option>
-                <option value="tiered_milestones">Tiered Milestones</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="param-threshold" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Threshold</label>
-              <input
-                id="param-threshold"
-                type="number"
-                min={1}
-                value={params.threshold}
-                onChange={(e) =>
-                  handleParamChange('threshold', Number(e.target.value))
-                }
-                className="input-base"
-              />
-            </div>
-            <div className="sm:col-span-2 flex flex-col gap-1.5">
-              <label htmlFor="param-reward" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Reward</label>
-              <input
-                id="param-reward"
-                type="text"
-                value={params.reward}
-                onChange={(e) =>
-                  handleParamChange('reward', e.target.value)
-                }
-                className="input-base"
-                placeholder="e.g. unlock_pro_tier"
-              />
-            </div>
+      <div className="flex flex-col gap-4">
+        {/* Parameter fields */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2 flex flex-col gap-1.5">
+            <label htmlFor="param-loop-name" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Loop Name</label>
+            <input
+              id="param-loop-name"
+              type="text"
+              value={params.loopName}
+              onChange={(e) =>
+                handleParamChange('loopName', e.target.value)
+              }
+              className="input-base"
+              placeholder="e.g. my-referral-loop"
+            />
           </div>
-
-          {/* Code output */}
-          <div className="relative group">
-            <div className="code-panel p-4 overflow-x-auto max-h-80">
-              <pre
-                data-testid="code-output"
-                className="text-green-400 whitespace-pre text-xs sm:text-sm leading-relaxed"
-              >
-                {code}
-              </pre>
-            </div>
-            <div className="absolute top-3 right-3 flex gap-2">
-              <button
-                onClick={handleCopy}
-                className="btn-secondary text-xs px-3 py-1.5 opacity-70 group-hover:opacity-100 transition-opacity"
-                aria-label="Copy code snippet"
-              >
-                <svg className="w-3.5 h-3.5 mr-1.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Copy
-              </button>
-              <button
-                onClick={handleDownload}
-                className="btn-secondary text-xs px-3 py-1.5 opacity-70 group-hover:opacity-100 transition-opacity"
-                aria-label="Download code file"
-              >
-                <svg className="w-3.5 h-3.5 mr-1.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Download
-              </button>
-            </div>
-          </div>
-
-          {/* Integration Guide */}
-          <div data-testid="integration-guide" className="metric-card">
-            <h3 className="text-sm font-semibold text-white mb-3">Integration Guide</h3>
-            <ol className="flex flex-col gap-2.5 text-sm text-gray-400">
-              <li className="flex gap-2.5">
-                <span className="flex-shrink-0 w-5 h-5 rounded-md bg-brand-500/10 text-brand-400 text-xs font-bold flex items-center justify-center">1</span>
-                <span>Install the SDK: <code className="text-emerald-400 font-mono text-xs">npm install @loopengine/sdk</code></span>
-              </li>
-              <li className="flex gap-2.5">
-                <span className="flex-shrink-0 w-5 h-5 rounded-md bg-brand-500/10 text-brand-400 text-xs font-bold flex items-center justify-center">2</span>
-                <span>Add your API key to <code className="text-emerald-400 font-mono text-xs">.env</code>: <code className="text-emerald-400 font-mono text-xs">VITE_LOOPENGINE_KEY=your_key</code></span>
-              </li>
-              <li className="flex gap-2.5">
-                <span className="flex-shrink-0 w-5 h-5 rounded-md bg-brand-500/10 text-brand-400 text-xs font-bold flex items-center justify-center">3</span>
-                <span>Paste the generated code into your component file</span>
-              </li>
-              <li className="flex gap-2.5">
-                <span className="flex-shrink-0 w-5 h-5 rounded-md bg-brand-500/10 text-brand-400 text-xs font-bold flex items-center justify-center">4</span>
-                <span>Import and render the widget in your app</span>
-              </li>
-            </ol>
-          </div>
-        </div>
-      ) : (
-        <div className="metric-card text-center py-16 text-gray-500">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-800/50 flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="param-incentive-type" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Incentive Type</label>
+            <select
+              id="param-incentive-type"
+              value={params.incentiveType}
+              onChange={(e) =>
+                handleParamChange('incentiveType', e.target.value)
+              }
+              className="input-base"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-              />
-            </svg>
+              <option value="threshold">Threshold</option>
+              <option value="waitlist_position">Waitlist Position</option>
+              <option value="tiered_milestones">Tiered Milestones</option>
+            </select>
           </div>
-          <p className="text-sm font-medium text-gray-400">Select a template to generate your code snippet</p>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="param-threshold" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Threshold</label>
+            <input
+              id="param-threshold"
+              type="number"
+              min={1}
+              value={params.threshold}
+              onChange={(e) =>
+                handleParamChange('threshold', Number(e.target.value))
+              }
+              className="input-base"
+            />
+          </div>
+          <div className="sm:col-span-2 flex flex-col gap-1.5">
+            <label htmlFor="param-reward" className="text-xs font-medium text-gray-400 uppercase tracking-wider">Reward</label>
+            <input
+              id="param-reward"
+              type="text"
+              value={params.reward}
+              onChange={(e) =>
+                handleParamChange('reward', e.target.value)
+              }
+              className="input-base"
+              placeholder="e.g. unlock_pro_tier"
+            />
+          </div>
         </div>
-      )}
+
+        {/* Code output */}
+        <div className="relative group">
+          <div className="code-panel p-4 overflow-x-auto max-h-80">
+            <pre
+              data-testid="code-output"
+              className="text-green-400 whitespace-pre text-xs sm:text-sm leading-relaxed"
+            >
+              {code}
+            </pre>
+          </div>
+          <div className="absolute top-3 right-3 flex gap-2">
+            <button
+              onClick={handleCopy}
+              className="btn-secondary text-xs px-3 py-1.5 opacity-70 group-hover:opacity-100 transition-opacity"
+              aria-label="Copy code snippet"
+            >
+              <svg className="w-3.5 h-3.5 mr-1.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              Copy
+            </button>
+            <button
+              onClick={handleDownload}
+              className="btn-secondary text-xs px-3 py-1.5 opacity-70 group-hover:opacity-100 transition-opacity"
+              aria-label="Download code file"
+            >
+              <svg className="w-3.5 h-3.5 mr-1.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

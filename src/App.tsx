@@ -228,7 +228,21 @@ export function App() {
       case 'generator':
         return (
           <ErrorBoundary>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {selectedTemplate ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Suspense fallback={<GeneratorSkeleton />}>
+                  <SnippetGenerator
+                    selectedTemplate={selectedTemplate}
+                    params={params}
+                    onParamsChange={handleParamsChange}
+                    onTemplateSelect={handleTemplateSelect}
+                  />
+                </Suspense>
+                <Suspense fallback={<SkeletonCodeBlock />}>
+                  <LivePreview loopType={loopType} params={params} />
+                </Suspense>
+              </div>
+            ) : (
               <Suspense fallback={<GeneratorSkeleton />}>
                 <SnippetGenerator
                   selectedTemplate={selectedTemplate}
@@ -237,10 +251,7 @@ export function App() {
                   onTemplateSelect={handleTemplateSelect}
                 />
               </Suspense>
-              <Suspense fallback={<SkeletonCodeBlock />}>
-                <LivePreview loopType={loopType} params={params} />
-              </Suspense>
-            </div>
+            )}
           </ErrorBoundary>
         );
       case 'analytics':

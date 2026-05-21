@@ -40,7 +40,10 @@ describe('Primary Workflow: Generate and Export a Referral Loop', () => {
     await waitFor(() => {
       expect(screen.getByTestId('code-output')).toBeInTheDocument();
     });
-    expect(screen.getByTestId('preview-content')).toBeInTheDocument();
+    // LivePreview is lazy-loaded — wait for it to resolve
+    await waitFor(() => {
+      expect(screen.getByTestId('preview-content')).toBeInTheDocument();
+    });
 
     // Step 5: Copy button should be available and functional
     const mockWriteText = vi.fn().mockResolvedValue(undefined);

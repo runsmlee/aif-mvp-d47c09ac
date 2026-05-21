@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SnippetGenerator } from '../src/components/SnippetGenerator';
 import { templates } from '../src/data/templates';
@@ -76,34 +76,32 @@ describe('SnippetGenerator', () => {
         params={params}
       />
     );
-    const copyButton = screen.getByRole('button', { name: /copy/i });
+    const copyButton = screen.getByRole('button', { name: /copy code snippet/i });
     await userEvent.click(copyButton);
     expect(mockWriteText).toHaveBeenCalled();
   });
 
-  it('shows empty state with prompt to select a template when no template is chosen', () => {
+  it('shows hero code panel with SDK quickstart snippet when no template is chosen', () => {
     render(<SnippetGenerator {...defaultProps} />);
-    expect(
-      screen.getByText(/select a template to generate/i)
-    ).toBeInTheDocument();
+    // The hero code panel is the first thing visible
+    expect(screen.getByTestId('hero-code-panel')).toBeInTheDocument();
+    // It should contain the ViralKit branded comment
+    expect(screen.getByTestId('code-output').textContent).toContain('ViralKit');
+    // The hero copy button should be prominently visible
+    expect(screen.getByTestId('hero-copy-button')).toBeInTheDocument();
   });
 
-  it('shows integration guide when a template is selected', () => {
-    const params = {
-      incentiveType: 'threshold' as const,
-      threshold: 3,
-      reward: 'Unlock Pro tier',
-      loopName: 'referral-link',
-    };
-    render(
-      <SnippetGenerator
-        {...defaultProps}
-        selectedTemplate={templates[1]}
-        params={params}
-      />
-    );
-    expect(screen.getByTestId('integration-guide')).toBeInTheDocument();
-    expect(screen.getByText(/integration guide/i)).toBeInTheDocument();
+  it('hero code panel copy includes branded comment', async () => {
+    const mockWriteText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, {
+      clipboard: { writeText: mockWriteText },
+    });
+    render(<SnippetGenerator {...defaultProps} />);
+    const heroCopyBtn = screen.getByTestId('hero-copy-button');
+    await userEvent.click(heroCopyBtn);
+    expect(mockWriteText).toHaveBeenCalled();
+    const copiedText = mockWriteText.mock.calls[0][0] as string;
+    expect(copiedText).toContain('// ViralKit — viralkit.dev');
   });
 
   it('generates code referencing LoopEngine SDK', () => {
