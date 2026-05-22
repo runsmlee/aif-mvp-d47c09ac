@@ -13,7 +13,7 @@ interface SnippetGeneratorProps {
 /*  Hero quickstart snippet — shown when no template is selected      */
 /* ------------------------------------------------------------------ */
 
-const HERO_SNIPPET = `// ViralKit — viralkit.dev
+const HERO_SNIPPET = `// ViralKit — loopengine.dev
 import { ViralKit } from '@viralkit/sdk';
 
 const loop = ViralKit.createLoop({

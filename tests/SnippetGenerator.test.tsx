@@ -101,7 +101,7 @@ describe('SnippetGenerator', () => {
     await userEvent.click(heroCopyBtn);
     expect(mockWriteText).toHaveBeenCalled();
     const copiedText = mockWriteText.mock.calls[0][0] as string;
-    expect(copiedText).toContain('// ViralKit — viralkit.dev');
+    expect(copiedText).toContain('// ViralKit — loopengine.dev');
   });
 
   it('generates code referencing LoopEngine SDK', () => {
