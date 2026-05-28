@@ -280,9 +280,9 @@ function HeroCodePanel() {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(HERO_SNIPPET).then(() => {
+    const attributed = HERO_SNIPPET + '\n// Powered by ViralKit — viralkit.dev';
+    navigator.clipboard.writeText(attributed).then(() => {
       setCopied(true);
-      // Track the copy event
       window.aif?.track('hero_copy', { snippet: 'quickstart' });
     });
   }, []);
@@ -295,12 +295,20 @@ function HeroCodePanel() {
 
   const highlighted = useMemo(() => highlightTokens(HERO_SNIPPET), []);
 
+  const handleCtaClick = useCallback(() => {
+    const selectEl = document.getElementById('template-select');
+    if (selectEl) {
+      selectEl.focus();
+    }
+    window.aif?.track('cta_click', { button: 'get_started', position: 'hero' });
+  }, []);
+
   return (
-    <div className="flex flex-col gap-4">
-      {/* Full-width code panel — ~70% of viewport */}
+    <div className="flex flex-col lg:flex-row gap-6" data-testid="hero-wrapper">
+      {/* Code panel — ~70% of hero width */}
       <div
-        className="relative group code-panel p-5 sm:p-6 lg:p-8 overflow-x-auto"
-        style={{ minHeight: 'clamp(280px, 70vh, 560px)' }}
+        className="lg:w-[70%] relative group code-panel p-5 sm:p-6 lg:p-8 overflow-x-auto"
+        style={{ minHeight: 'clamp(280px, 60vh, 480px)' }}
         data-testid="hero-code-panel"
       >
         {/* File tab bar */}
@@ -347,10 +355,33 @@ function HeroCodePanel() {
         </pre>
       </div>
 
-      {/* Single-line value prop */}
-      <p className="text-center text-sm text-gray-400 font-medium">
-        Embed viral loops in minutes. Copy, paste, ship.
-      </p>
+      {/* Copy section — ~30% of hero width */}
+      <div
+        className="lg:w-[30%] flex flex-col justify-center gap-5 py-2 lg:py-6"
+        data-testid="hero-copy-section"
+      >
+        <div>
+          <h2 className="text-2xl lg:text-3xl font-bold text-white leading-tight">
+            Embed viral loops in your product
+          </h2>
+          <p className="mt-3 text-sm text-gray-400 leading-relaxed">
+            Copy-paste SDK snippets for referral loops, waitlists, and tiered
+            rewards. Ship growth mechanics in minutes, not weeks.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3">
+          <button
+            className="btn-primary w-full"
+            onClick={handleCtaClick}
+            data-testid="hero-cta-button"
+          >
+            Get Started
+          </button>
+          <p className="text-xs text-gray-500 text-center">
+            No signup required · 6 free templates
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -102,6 +102,34 @@ describe('SnippetGenerator', () => {
     expect(mockWriteText).toHaveBeenCalled();
     const copiedText = mockWriteText.mock.calls[0][0] as string;
     expect(copiedText).toContain('// ViralKit — loopengine.dev');
+    expect(copiedText).toContain('// Powered by ViralKit — viralkit.dev');
+  });
+
+  it('renders hero with 70/30 split layout (code panel + copy section)', () => {
+    render(<SnippetGenerator {...defaultProps} />);
+    // The hero wrapper should use flex-row for side-by-side layout
+    const heroPanel = screen.getByTestId('hero-code-panel');
+    expect(heroPanel).toBeInTheDocument();
+    // The parent wrapper should have the split layout class
+    const heroWrapper = heroPanel.closest('[data-testid="hero-wrapper"]');
+    expect(heroWrapper).toBeInTheDocument();
+    // Value prop copy section should exist
+    expect(screen.getByTestId('hero-copy-section')).toBeInTheDocument();
+  });
+
+  it('renders primary CTA button in the copy section', () => {
+    render(<SnippetGenerator {...defaultProps} />);
+    const ctaButton = screen.getByTestId('hero-cta-button');
+    expect(ctaButton).toBeInTheDocument();
+    expect(ctaButton.tagName).toBe('BUTTON');
+  });
+
+  it('CTA button focuses template selector when clicked', async () => {
+    render(<SnippetGenerator {...defaultProps} />);
+    const ctaButton = screen.getByTestId('hero-cta-button');
+    await userEvent.click(ctaButton);
+    const templateSelect = screen.getByLabelText(/select a template/i);
+    expect(templateSelect).toHaveFocus();
   });
 
   it('generates code referencing LoopEngine SDK', () => {
