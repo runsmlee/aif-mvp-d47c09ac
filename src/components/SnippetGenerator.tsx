@@ -58,7 +58,7 @@ function highlightTokens(code: string): React.ReactNode[] {
     // Comment line
     if (line.trimStart().startsWith('//')) {
       nodes.push(
-        h('span', { key: `c-${li}`, className: 'text-gray-500 italic' }, line)
+        h('span', { key: `c-${li}`, className: 'text-stone-500 italic' }, line)
       );
       continue;
     }
@@ -74,42 +74,42 @@ function highlightTokens(code: string): React.ReactNode[] {
 
       // Inline comment
       if (token.startsWith('//')) {
-        nodes.push(h('span', { key: k, className: 'text-gray-500 italic' }, token));
+        nodes.push(h('span', { key: k, className: 'text-stone-500 italic' }, token));
         continue;
       }
 
       // String
       if (token.startsWith("'") || token.startsWith('"') || token.startsWith('`')) {
-        nodes.push(h('span', { key: k, className: 'text-emerald-400' }, token));
+        nodes.push(h('span', { key: k, className: 'text-teal-400' }, token));
         continue;
       }
 
       // JSX tag
       if (JSX_TAGS.has(token)) {
-        nodes.push(h('span', { key: k, className: 'text-sky-400' }, token));
+        nodes.push(h('span', { key: k, className: 'text-amber-400 font-medium' }, token));
         continue;
       }
 
       // Keyword
       if (KEYWORDS.has(token)) {
-        nodes.push(h('span', { key: k, className: 'text-violet-400 font-semibold' }, token));
+        nodes.push(h('span', { key: k, className: 'text-rose-400 font-semibold' }, token));
         continue;
       }
 
       // Number
       if (/^\d+$/.test(token)) {
-        nodes.push(h('span', { key: k, className: 'text-amber-300' }, token));
+        nodes.push(h('span', { key: k, className: 'text-orange-400' }, token));
         continue;
       }
 
       // Bracket / punctuation
       if ('{}()[];=<>,'.includes(token)) {
-        nodes.push(h('span', { key: k, className: 'text-gray-400' }, token));
+        nodes.push(h('span', { key: k, className: 'text-stone-400' }, token));
         continue;
       }
 
       // Default — identifier
-      nodes.push(h('span', { key: k, className: 'text-gray-200' }, token));
+      nodes.push(h('span', { key: k, className: 'text-stone-200' }, token));
     }
   }
 
@@ -307,19 +307,23 @@ function HeroCodePanel() {
     <div className="flex flex-col lg:flex-row gap-6" data-testid="hero-wrapper">
       {/* Code panel — ~70% of hero width */}
       <div
-        className="lg:w-[70%] relative group code-panel p-5 sm:p-6 lg:p-8 overflow-x-auto"
-        style={{ minHeight: 'clamp(280px, 60vh, 480px)' }}
+        className="lg:w-[70%] relative group overflow-x-auto rounded-xl border border-brand-500/20 p-5 sm:p-6 lg:p-8"
+        style={{
+          minHeight: 'clamp(280px, 60vh, 480px)',
+          background: 'linear-gradient(135deg, #1a1018 0%, #14121f 50%, #181420 100%)',
+          boxShadow: '0 0 40px rgba(185, 28, 28, 0.08), 0 4px 24px rgba(0,0,0,0.4)',
+        }}
         data-testid="hero-code-panel"
       >
         {/* File tab bar */}
-        <div className="flex items-center justify-between mb-5 pb-4 border-b border-gray-800/60">
+        <div className="flex items-center justify-between mb-5 pb-4 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
             <div className="flex gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
-              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
-              <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
+              <div className="w-2.5 h-2.5 rounded-full bg-brand-400/70" />
+              <div className="w-2.5 h-2.5 rounded-full bg-amber-400/60" />
+              <div className="w-2.5 h-2.5 rounded-full bg-teal-400/50" />
             </div>
-            <span className="text-xs text-gray-500 font-mono">ReferralWidget.tsx</span>
+            <span className="text-xs text-stone-500 font-mono">ReferralWidget.tsx</span>
           </div>
           {/* Prominent copy button — always visible */}
           <button
@@ -362,7 +366,7 @@ function HeroCodePanel() {
       >
         <div>
           <h2 className="text-2xl lg:text-3xl font-bold text-white leading-tight">
-            Embed viral loops in your product
+            Embed viral loops in 3 lines
           </h2>
           <p className="mt-3 text-sm text-gray-400 leading-relaxed">
             Copy-paste SDK snippets for referral loops, waitlists, and tiered
@@ -375,7 +379,7 @@ function HeroCodePanel() {
             onClick={handleCtaClick}
             data-testid="hero-cta-button"
           >
-            Get Started
+            Get API Key
           </button>
           <p className="text-xs text-gray-500 text-center">
             No signup required · 6 free templates

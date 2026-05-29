@@ -106,6 +106,15 @@
       radial-gradient(ellipse at top left, rgba(185, 28, 28, 0.03), transparent 50%);
   }
 
+  /* === Hero Code Panel (distinctive warm palette) === */
+  .hero-code-panel {
+    background: linear-gradient(135deg, #1a1018 0%, #14121f 50%, #181420 100%);
+    box-shadow:
+      0 0 40px rgba(185, 28, 28, 0.08),
+      0 4px 24px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(185, 28, 28, 0.2);
+  }
+
   /* === Metric Cards === */
   .metric-card {
     @apply bg-gray-900/80 rounded-xl border border-gray-800/60 p-5;

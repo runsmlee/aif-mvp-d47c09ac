@@ -6,10 +6,8 @@ import { mockAnalyticsData } from './data/mockAnalytics';
 import { templates } from './data/templates';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { SkeletonCard, SkeletonCodeBlock, SkeletonForm, SkeletonMetricCards } from './components/Skeleton';
+import { SnippetGenerator } from './components/SnippetGenerator';
 
-const SnippetGenerator = lazy(() =>
-  import('./components/SnippetGenerator').then((m) => ({ default: m.SnippetGenerator }))
-);
 const KFactorDashboard = lazy(() =>
   import('./components/KFactorDashboard').then((m) => ({ default: m.KFactorDashboard }))
 );
@@ -230,27 +228,23 @@ export function App() {
           <ErrorBoundary>
             {selectedTemplate ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Suspense fallback={<GeneratorSkeleton />}>
-                  <SnippetGenerator
-                    selectedTemplate={selectedTemplate}
-                    params={params}
-                    onParamsChange={handleParamsChange}
-                    onTemplateSelect={handleTemplateSelect}
-                  />
-                </Suspense>
-                <Suspense fallback={<SkeletonCodeBlock />}>
-                  <LivePreview loopType={loopType} params={params} />
-                </Suspense>
-              </div>
-            ) : (
-              <Suspense fallback={<GeneratorSkeleton />}>
                 <SnippetGenerator
                   selectedTemplate={selectedTemplate}
                   params={params}
                   onParamsChange={handleParamsChange}
                   onTemplateSelect={handleTemplateSelect}
                 />
-              </Suspense>
+                <Suspense fallback={<SkeletonCodeBlock />}>
+                  <LivePreview loopType={loopType} params={params} />
+                </Suspense>
+              </div>
+            ) : (
+              <SnippetGenerator
+                selectedTemplate={selectedTemplate}
+                params={params}
+                onParamsChange={handleParamsChange}
+                onTemplateSelect={handleTemplateSelect}
+              />
             )}
           </ErrorBoundary>
         );
