@@ -175,7 +175,13 @@ export function App() {
     'loopengine_params',
     null
   );
-  const [incentiveRules, setIncentiveRules] = useState<IncentiveRule[]>([]);
+  const [incentiveRules, setIncentiveRules] =
+    useLocalStorage<IncentiveRule[]>('loopengine_incentive_rules', []);
+
+  // Track initial page view
+  useEffect(() => {
+    window.aif?.track('page_view', { path: window.location.pathname });
+  }, []);
 
   // Enable keyboard shortcuts
   useKeyboardShortcuts(setActiveView);
