@@ -305,6 +305,42 @@ function HeroCodePanel() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6" data-testid="hero-wrapper">
+      {/* Value prop — leads first */}
+      <div
+        className="lg:w-[30%] flex flex-col justify-center gap-5 py-2 lg:py-6"
+        data-testid="hero-copy-section"
+      >
+        <div>
+          <h2 className="text-2xl lg:text-3xl font-bold text-white leading-tight">
+            Will your referral program pay for itself?
+          </h2>
+          <p className="mt-3 text-sm text-gray-400 leading-relaxed">
+            Copy-paste SDK snippets for referral loops, waitlists, and tiered
+            rewards. Ship growth mechanics in minutes, not weeks.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3">
+          <button
+            className="btn-primary w-full"
+            onClick={handleCtaClick}
+            data-testid="hero-cta-button"
+          >
+            Get API Key
+          </button>
+          {/* Subtle trust badges — proof points below the CTA */}
+          <div className="flex items-center justify-center gap-3 text-[11px] text-gray-500">
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+              Runs in browser
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+              No data sent
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Code panel — ~70% of hero width */}
       <div
         className="lg:w-[70%] relative group overflow-x-auto rounded-xl border border-brand-500/20 p-5 sm:p-6 lg:p-8"
@@ -357,34 +393,6 @@ function HeroCodePanel() {
         >
           <code>{highlighted}</code>
         </pre>
-      </div>
-
-      {/* Copy section — ~30% of hero width */}
-      <div
-        className="lg:w-[30%] flex flex-col justify-center gap-5 py-2 lg:py-6"
-        data-testid="hero-copy-section"
-      >
-        <div>
-          <h2 className="text-2xl lg:text-3xl font-bold text-white leading-tight">
-            Embed viral loops in 3 lines
-          </h2>
-          <p className="mt-3 text-sm text-gray-400 leading-relaxed">
-            Copy-paste SDK snippets for referral loops, waitlists, and tiered
-            rewards. Ship growth mechanics in minutes, not weeks.
-          </p>
-        </div>
-        <div className="flex flex-col gap-3">
-          <button
-            className="btn-primary w-full"
-            onClick={handleCtaClick}
-            data-testid="hero-cta-button"
-          >
-            Get API Key
-          </button>
-          <p className="text-xs text-gray-500 text-center">
-            No signup required · 6 free templates
-          </p>
-        </div>
       </div>
     </div>
   );
