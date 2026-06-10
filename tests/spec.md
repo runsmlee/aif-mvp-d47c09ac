@@ -101,3 +101,14 @@
 - [x] Version bump to v1.2.0
 - [x] Added SkeletonLoading.test.tsx (5 tests) and KeyboardShortcuts.test.tsx (7 tests)
 - [x] Overall test coverage: 93.84% statements, 91.07% branches
+
+## Improvement Iteration (v1.2.2) — SEO Discoverability (sharpen)
+- [x] Added SEOContent component with 3 structured H2 content sections below the calculator
+- [x] Section 1: "What is K-Factor? How to Calculate Viral Coefficient" — K=i×c formula with worked example
+- [x] Section 2: "Referral Program ROI: When Does It Pay Off?" — CAC vs referral cost, break-even timelines
+- [x] Section 3: "Who Should Use This Calculator" — targets growth engineers at SaaS startups
+- [x] Each section: 150-250 words with SEO keywords and internal anchor linking back to calculator
+- [x] Added id="calculator" anchor to generator hero for internal linking
+- [x] SEOContent rendered only in landing page state (no template selected)
+- [x] Added SEOContent.test.tsx (5 tests): H2 headings, anchor links, SEO keywords, semantic HTML, accessible region
+- [x] Feature count unchanged (BASELINE: 1) — SEO content is within the generator view, not a new feature surface

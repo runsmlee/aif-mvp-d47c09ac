@@ -1,6 +1,7 @@
 import { useMemo, useCallback, useState, useEffect, createElement as h, Fragment } from 'react';
 import type { ViralTemplate, TemplateParams } from '../types';
 import { templates } from '../data/templates';
+import { SEOContent } from './SEOContent';
 
 interface SnippetGeneratorProps {
   selectedTemplate: ViralTemplate | null;
@@ -457,7 +458,7 @@ export function SnippetGenerator({
   /* ---- No template selected: show hero code panel ---- */
   if (!selectedTemplate || !params) {
     return (
-      <div className="flex flex-col gap-6">
+      <div id="calculator" className="flex flex-col gap-6">
         {/* Small label for test compatibility */}
         <h2 className="text-lg font-semibold text-white tracking-tight">Snippet Generator</h2>
 
@@ -486,6 +487,9 @@ export function SnippetGenerator({
             ))}
           </select>
         </div>
+
+        {/* SEO resource content — discoverability layer */}
+        <SEOContent />
       </div>
     );
   }
