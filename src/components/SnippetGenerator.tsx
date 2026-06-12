@@ -416,7 +416,7 @@ export function SnippetGenerator({
 
   const handleCopy = useCallback(() => {
     if (code) {
-      navigator.clipboard.writeText(code);
+      void navigator.clipboard.writeText(code);
       window.aif?.track('snippet_copy', { template: selectedTemplate?.id });
     }
   }, [code, selectedTemplate]);

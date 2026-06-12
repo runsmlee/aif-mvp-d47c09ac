@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
+import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import type { ViralTemplate, TemplateParams, IncentiveRule, AppView } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -186,8 +186,11 @@ export function App() {
   // Enable keyboard shortcuts
   useKeyboardShortcuts(setActiveView);
 
-  // Restore selected template from localStorage on mount
+  // Restore selected template from localStorage on mount (one-time validation)
+  const initializedRef = useRef(false);
   useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
     if (selectedTemplate) {
       const found = templates.find((t) => t.id === selectedTemplate.id);
       if (found) {
@@ -197,7 +200,7 @@ export function App() {
         }
       }
     }
-  }, []);
+  }, [selectedTemplate, setSelectedTemplate, params, setParams]);
 
   const handleTemplateSelect = useCallback(
     (template: ViralTemplate) => {

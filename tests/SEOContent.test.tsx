@@ -8,19 +8,41 @@ describe('SEOContent', () => {
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /What is K-Factor\? How to Calculate Viral Coefficient/i,
+        name: /What Is Viral Coefficient \(K-Factor\)\?/i,
       })
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /Referral Program ROI: When Does It Pay Off\?/i,
+        name: /When Does a Referral Program Break Even\?/i,
       })
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /Who Should Use This Calculator/i,
+        name: /How to Calculate Referral Program ROI/i,
+      })
+    ).toBeInTheDocument();
+  });
+
+  it('renders H3 subheadings for proper heading hierarchy', () => {
+    render(<SEOContent />);
+    expect(
+      screen.getByRole('heading', {
+        level: 3,
+        name: /The K-Factor Formula: K = i/i,
+      })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        level: 3,
+        name: /CAC vs LTV: The Referral Economics Framework/i,
+      })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        level: 3,
+        name: /Step-by-Step: Using This Calculator/i,
       })
     ).toBeInTheDocument();
   });
@@ -41,6 +63,8 @@ describe('SEOContent', () => {
     expect(content).toContain('K-factor formula');
     expect(content).toContain('referral program break even');
     expect(content).toContain('referral program ROI');
+    expect(content).toContain('CAC');
+    expect(content).toContain('LTV');
   });
 
   it('uses semantic HTML with article elements for each section', () => {

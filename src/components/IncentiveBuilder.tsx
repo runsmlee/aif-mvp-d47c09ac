@@ -205,7 +205,7 @@ export function IncentiveBuilder({
         ...(r.thresholds ? { thresholds: r.thresholds } : {}),
       })),
     };
-    navigator.clipboard.writeText(JSON.stringify(config, null, 2));
+    void navigator.clipboard.writeText(JSON.stringify(config, null, 2));
   }, [rules, canExport]);
 
   return (
