@@ -8,19 +8,19 @@ describe('SEOContent', () => {
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /What Is Viral Coefficient \(K-Factor\)\?/i,
+        name: /Viral Coefficient Calculator: Understanding K-Factor for Growth/i,
       })
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /When Does a Referral Program Break Even\?/i,
+        name: /Referral Program Break-Even: When Does It Pay for Itself\?/i,
       })
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /How to Calculate Referral Program ROI/i,
+        name: /The K-Factor Formula: How to Calculate Viral Growth/i,
       })
     ).toBeInTheDocument();
   });

@@ -20,7 +20,7 @@ export function SEOContent() {
       {/* ────────── Section 1: K-Factor ────────── */}
       <article className="max-w-3xl">
         <h2 className="text-xl font-bold text-white tracking-tight">
-          What Is Viral Coefficient (K-Factor)?
+          Viral Coefficient Calculator: Understanding K-Factor for Growth
         </h2>
 
         <div className="mt-4 space-y-4 text-sm leading-relaxed text-gray-400">
@@ -69,7 +69,7 @@ export function SEOContent() {
       {/* ────────── Section 2: Break Even ────────── */}
       <article className="max-w-3xl">
         <h2 className="text-xl font-bold text-white tracking-tight">
-          When Does a Referral Program Break Even?
+          Referral Program Break-Even: When Does It Pay for Itself?
         </h2>
 
         <div className="mt-4 space-y-4 text-sm leading-relaxed text-gray-400">
@@ -120,7 +120,7 @@ export function SEOContent() {
       {/* ────────── Section 3: How to Calculate ROI ────────── */}
       <article className="max-w-3xl">
         <h2 className="text-xl font-bold text-white tracking-tight">
-          How to Calculate Referral Program ROI
+          The K-Factor Formula: How to Calculate Viral Growth
         </h2>
 
         <div className="mt-4 space-y-4 text-sm leading-relaxed text-gray-400">
