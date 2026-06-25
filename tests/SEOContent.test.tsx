@@ -8,19 +8,19 @@ describe('SEOContent', () => {
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /Viral Coefficient Calculator: Understanding K-Factor for Growth/i,
+        name: /Viral Coefficient Calculator/i,
       })
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /Referral Program Break-Even: When Does It Pay for Itself\?/i,
+        name: /Referral Program Break-Even Analysis/i,
       })
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /The K-Factor Formula: How to Calculate Viral Growth/i,
+        name: /K-Factor Formula Explained/i,
       })
     ).toBeInTheDocument();
   });
@@ -77,5 +77,16 @@ describe('SEOContent', () => {
     render(<SEOContent />);
     const section = screen.getByRole('region', { name: /learn more about referral economics/i });
     expect(section).toBeInTheDocument();
+  });
+
+  it('each section contains at least 100 words of substantive text', () => {
+    render(<SEOContent />);
+    const articles = screen.getAllByRole('article');
+    expect(articles).toHaveLength(3);
+    articles.forEach((article) => {
+      const text = article.textContent ?? '';
+      const wordCount = text.trim().split(/\s+/).length;
+      expect(wordCount).toBeGreaterThanOrEqual(100);
+    });
   });
 });

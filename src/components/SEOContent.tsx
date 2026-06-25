@@ -20,7 +20,7 @@ export function SEOContent() {
       {/* ────────── Section 1: K-Factor ────────── */}
       <article className="max-w-3xl">
         <h2 className="text-xl font-bold text-white tracking-tight">
-          Viral Coefficient Calculator: Understanding K-Factor for Growth
+          Viral Coefficient Calculator
         </h2>
 
         <div className="mt-4 space-y-4 text-sm leading-relaxed text-gray-400">
@@ -31,7 +31,10 @@ export function SEOContent() {
             referral program can grow on its own. A K-factor above 1 means every
             user brings in more than one new user — exponential organic growth.
             Below 1, your referral channel is slowly decaying and needs a higher
-            reward or lower friction to sustain momentum.
+            reward or lower friction to sustain momentum. This tool computes your
+            K-factor in real time as you adjust the invitation and conversion
+            parameters, so you can model different growth scenarios instantly
+            without building a spreadsheet from scratch.
           </p>
 
           <h3 className="text-base font-semibold text-gray-200 pt-2">
@@ -69,7 +72,7 @@ export function SEOContent() {
       {/* ────────── Section 2: Break Even ────────── */}
       <article className="max-w-3xl">
         <h2 className="text-xl font-bold text-white tracking-tight">
-          Referral Program Break-Even: When Does It Pay for Itself?
+          Referral Program Break-Even Analysis
         </h2>
 
         <div className="mt-4 space-y-4 text-sm leading-relaxed text-gray-400">
@@ -120,7 +123,7 @@ export function SEOContent() {
       {/* ────────── Section 3: How to Calculate ROI ────────── */}
       <article className="max-w-3xl">
         <h2 className="text-xl font-bold text-white tracking-tight">
-          The K-Factor Formula: How to Calculate Viral Growth
+          K-Factor Formula Explained
         </h2>
 
         <div className="mt-4 space-y-4 text-sm leading-relaxed text-gray-400">
