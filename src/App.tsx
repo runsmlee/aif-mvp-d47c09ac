@@ -7,6 +7,7 @@ import { templates } from './data/templates';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { SkeletonCard, SkeletonCodeBlock, SkeletonForm, SkeletonMetricCards } from './components/Skeleton';
 import { SnippetGenerator } from './components/SnippetGenerator';
+import { SEOContent } from './components/SEOContent';
 
 const KFactorDashboard = lazy(() =>
   import('./components/KFactorDashboard').then((m) => ({ default: m.KFactorDashboard }))
@@ -331,11 +332,12 @@ export function App() {
 
       <main
         className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto pt-16 md:pt-6"
-        id="main-content"
+        id="calculator"
         role="main"
         aria-label={`${activeView.charAt(0).toUpperCase() + activeView.slice(1)} view`}
       >
         <div className="max-w-6xl mx-auto">{renderContent()}</div>
+        <SEOContent />
       </main>
     </div>
   );
