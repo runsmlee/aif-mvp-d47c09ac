@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SnippetGenerator } from '../src/components/SnippetGenerator';
 import { templates } from '../src/data/templates';
@@ -81,36 +81,45 @@ describe('SnippetGenerator', () => {
     expect(mockWriteText).toHaveBeenCalled();
   });
 
-  it('shows hero code panel with SDK quickstart snippet when no template is chosen', () => {
+  it('shows interactive K-factor calculator hero when no template is chosen', () => {
     render(<SnippetGenerator {...defaultProps} />);
-    // The hero code panel is the first thing visible
+    // The hero calculator panel should be visible
     expect(screen.getByTestId('hero-code-panel')).toBeInTheDocument();
-    // It should contain the ViralKit branded comment
-    expect(screen.getByTestId('code-output').textContent).toContain('ViralKit');
-    // The hero copy button should be prominently visible
-    expect(screen.getByTestId('hero-copy-button')).toBeInTheDocument();
+    // K-factor result should be displayed
+    expect(screen.getByTestId('hero-kfactor')).toBeInTheDocument();
+    // Sliders should be present
+    expect(screen.getByLabelText(/average invites per user/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/invite conversion rate percentage/i)).toBeInTheDocument();
   });
 
-  it('hero code panel copy includes branded comment', async () => {
-    const mockWriteText = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: { writeText: mockWriteText },
-    });
+  it('computes K-factor = i × c in real-time as sliders change', async () => {
     render(<SnippetGenerator {...defaultProps} />);
-    const heroCopyBtn = screen.getByTestId('hero-copy-button');
-    await userEvent.click(heroCopyBtn);
-    expect(mockWriteText).toHaveBeenCalled();
-    const copiedText = mockWriteText.mock.calls[0][0] as string;
-    expect(copiedText).toContain('// ViralKit — loopengine.dev');
-    expect(copiedText).toContain('// Powered by ViralKit — viralkit.dev');
+
+    // Default values: invites=4, conversion=25% → K = 4 × 0.25 = 1.00
+    const kDisplay = screen.getByTestId('hero-kfactor');
+    expect(kDisplay.textContent).toBe('1.00');
+
+    // Change invites slider to 5 → K = 5 × 0.25 = 1.25
+    const invitesSlider = screen.getByLabelText(/average invites per user/i);
+    await userEvent.tab(); // focus first interactive element
+    invitesSlider.focus();
+    fireEvent.change(invitesSlider, { target: { value: '5' } });
+
+    expect(kDisplay.textContent).toBe('1.25');
+
+    // Change conversion slider to 40% → K = 5 × 0.40 = 2.00
+    const conversionSlider = screen.getByLabelText(/invite conversion rate percentage/i);
+    fireEvent.change(conversionSlider, { target: { value: '40' } });
+
+    expect(kDisplay.textContent).toBe('2.00');
   });
 
-  it('renders hero with 70/30 split layout (code panel + copy section)', () => {
+  it('renders hero with split layout (calculator panel + copy section)', () => {
     render(<SnippetGenerator {...defaultProps} />);
-    // The hero wrapper should use flex-row for side-by-side layout
+    // The hero wrapper should exist
     const heroPanel = screen.getByTestId('hero-code-panel');
     expect(heroPanel).toBeInTheDocument();
-    // The parent wrapper should have the split layout class
+    // The parent wrapper should have the split layout
     const heroWrapper = heroPanel.closest('[data-testid="hero-wrapper"]');
     expect(heroWrapper).toBeInTheDocument();
     // Value prop copy section should exist
@@ -149,5 +158,28 @@ describe('SnippetGenerator', () => {
     const codeOutput = screen.getByTestId('code-output');
     expect(codeOutput.textContent).toContain('LoopEngine');
     expect(codeOutput.textContent).toContain('@loopengine/sdk');
+  });
+
+  it('shows growth status text when K-factor is above 1', async () => {
+    render(<SnippetGenerator {...defaultProps} />);
+    // Default: invites=4, conversion=25% → K=1.00 — not above 1
+    // Change conversion to 30% → K = 4 × 0.30 = 1.20
+    const conversionSlider = screen.getByLabelText(/invite conversion rate percentage/i);
+    fireEvent.change(conversionSlider, { target: { value: '30' } });
+
+    const status = screen.getByTestId('hero-status');
+    expect(status.textContent).toMatch(/exponential growth/i);
+  });
+
+  it('shows decay status text when K-factor is well below 1', async () => {
+    render(<SnippetGenerator {...defaultProps} />);
+    // Set invites=2, conversion=10% → K = 0.20
+    const invitesSlider = screen.getByLabelText(/average invites per user/i);
+    fireEvent.change(invitesSlider, { target: { value: '2' } });
+    const conversionSlider = screen.getByLabelText(/invite conversion rate percentage/i);
+    fireEvent.change(conversionSlider, { target: { value: '10' } });
+
+    const status = screen.getByTestId('hero-status');
+    expect(status.textContent).toContain('not self-sustaining');
   });
 });

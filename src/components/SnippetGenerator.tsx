@@ -1,120 +1,12 @@
-import { useMemo, useCallback, useState, useEffect, createElement as h, Fragment } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import type { ViralTemplate, TemplateParams } from '../types';
 import { templates } from '../data/templates';
-import { SEOContent } from './SEOContent';
 
 interface SnippetGeneratorProps {
   selectedTemplate: ViralTemplate | null;
   params: TemplateParams | null;
   onParamsChange: (params: TemplateParams) => void;
   onTemplateSelect: (template: ViralTemplate) => void;
-}
-
-/* ------------------------------------------------------------------ */
-/*  Hero quickstart snippet — shown when no template is selected      */
-/* ------------------------------------------------------------------ */
-
-const HERO_SNIPPET = `// ViralKit — loopengine.dev
-import { ViralKit } from '@viralkit/sdk';
-
-const loop = ViralKit.createLoop({
-  name: 'my-referral-loop',
-  type: 'threshold',
-  config: {
-    threshold: 3,
-    reward: 'Unlock Pro tier',
-    onReward: (user) => {
-      console.log(\`User \${user.id} earned reward: Unlock Pro tier\`);
-    },
-  },
-});
-
-export default function ReferralWidget() {
-  return (
-    <loop.Provider>
-      <loop.ShareLink />
-      <loop.ReferralCounter />
-    </loop.Provider>
-  );
-}`;
-
-/** Lightweight syntax highlighter — no external deps */
-const KEYWORDS = new Set([
-  'import', 'from', 'const', 'export', 'default', 'function', 'return',
-  'typeof', 'new', 'let', 'var', 'if', 'else', 'async', 'await',
-]);
-
-const JSX_TAGS = new Set([
-  'loop.Provider', 'loop.ShareLink', 'loop.ReferralCounter',
-]);
-
-function highlightTokens(code: string): React.ReactNode[] {
-  const lines = code.split('\n');
-  const nodes: React.ReactNode[] = [];
-
-  for (let li = 0; li < lines.length; li++) {
-    if (li > 0) nodes.push('\n');
-    const line = lines[li];
-
-    // Comment line
-    if (line.trimStart().startsWith('//')) {
-      nodes.push(
-        h('span', { key: `c-${li}`, className: 'text-stone-500 italic' }, line)
-      );
-      continue;
-    }
-
-    // Tokenize the line using a simple regex approach
-    const tokenRe = /\/\/.*$|'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*`|[a-zA-Z_$][\w.$]*|[{}()<>=;,\[\]]|[^\s]/g;
-    let match: RegExpExecArray | null;
-    let keyIdx = 0;
-
-    while ((match = tokenRe.exec(line)) !== null) {
-      const token = match[0];
-      const k = `t-${li}-${keyIdx++}`;
-
-      // Inline comment
-      if (token.startsWith('//')) {
-        nodes.push(h('span', { key: k, className: 'text-stone-500 italic' }, token));
-        continue;
-      }
-
-      // String
-      if (token.startsWith("'") || token.startsWith('"') || token.startsWith('`')) {
-        nodes.push(h('span', { key: k, className: 'text-teal-400' }, token));
-        continue;
-      }
-
-      // JSX tag
-      if (JSX_TAGS.has(token)) {
-        nodes.push(h('span', { key: k, className: 'text-amber-400 font-medium' }, token));
-        continue;
-      }
-
-      // Keyword
-      if (KEYWORDS.has(token)) {
-        nodes.push(h('span', { key: k, className: 'text-rose-400 font-semibold' }, token));
-        continue;
-      }
-
-      // Number
-      if (/^\d+$/.test(token)) {
-        nodes.push(h('span', { key: k, className: 'text-orange-400' }, token));
-        continue;
-      }
-
-      // Bracket / punctuation
-      if ('{}()[];=<>,'.includes(token)) {
-        nodes.push(h('span', { key: k, className: 'text-stone-400' }, token));
-        continue;
-      }
-
-      // Default — identifier
-      nodes.push(h('span', { key: k, className: 'text-stone-200' }, token));
-    }
-  }
-
-  return nodes;
 }
 
 /* ------------------------------------------------------------------ */
@@ -274,41 +166,33 @@ export default function EarlyAccessWidget() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Hero Code Panel — first thing developers see                      */
+/*  Interactive K-Factor Calculator Hero — first thing users see      */
 /* ------------------------------------------------------------------ */
 
-function HeroCodePanel() {
-  const [copied, setCopied] = useState(false);
+function HeroCalculator() {
+  const [invites, setInvites] = useState(4);
+  const [conversionRate, setConversionRate] = useState(25);
 
-  const handleCopy = useCallback(() => {
-    const attributed = HERO_SNIPPET + '\n// Powered by ViralKit — viralkit.dev';
-    navigator.clipboard.writeText(attributed).then(() => {
-      setCopied(true);
-      window.aif?.track('hero_copy', { snippet: 'quickstart' });
-    });
-  }, []);
+  const kFactor = useMemo(
+    () => (invites * conversionRate) / 100,
+    [invites, conversionRate]
+  );
 
-  useEffect(() => {
-    if (!copied) return;
-    const timer = setTimeout(() => setCopied(false), 2000);
-    return () => clearTimeout(timer);
-  }, [copied]);
-
-  const highlighted = useMemo(() => highlightTokens(HERO_SNIPPET), []);
+  const growthStatus = kFactor > 1 ? 'growth' : kFactor > 0.5 ? 'caution' : 'decay';
 
   const handleCtaClick = useCallback(() => {
     const selectEl = document.getElementById('template-select');
     if (selectEl) {
       selectEl.focus();
     }
-    window.aif?.track('cta_click', { button: 'get_started', position: 'hero' });
+    window.aif?.track('cta_click', { button: 'configure', position: 'hero' });
   }, []);
 
   return (
     <div className="flex flex-col lg:flex-row gap-6" data-testid="hero-wrapper">
-      {/* Value prop — leads first */}
+      {/* Value prop + CTA */}
       <div
-        className="lg:w-[30%] flex flex-col justify-center gap-5 py-2 lg:py-6"
+        className="lg:w-[35%] flex flex-col justify-center gap-5 py-2 lg:py-6"
         data-testid="hero-copy-section"
       >
         <div>
@@ -316,8 +200,8 @@ function HeroCodePanel() {
             Will your referral program pay for itself?
           </h2>
           <p className="mt-3 text-sm text-gray-400 leading-relaxed">
-            Copy-paste SDK snippets for referral loops, waitlists, and tiered
-            rewards. Ship growth mechanics in minutes, not weeks.
+            Adjust the sliders to see your viral coefficient in real time.
+            Then generate production-ready SDK snippets for your referral loop.
           </p>
         </div>
         <div className="flex flex-col gap-3">
@@ -326,9 +210,8 @@ function HeroCodePanel() {
             onClick={handleCtaClick}
             data-testid="hero-cta-button"
           >
-            Get API Key
+            Configure Your Program
           </button>
-          {/* Subtle trust badges — proof points below the CTA */}
           <div className="flex items-center justify-center gap-3 text-[11px] text-gray-500">
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
@@ -342,58 +225,122 @@ function HeroCodePanel() {
         </div>
       </div>
 
-      {/* Code panel — ~70% of hero width */}
+      {/* Interactive K-factor calculator */}
       <div
-        className="lg:w-[70%] relative group overflow-x-auto rounded-xl border border-brand-500/20 p-5 sm:p-6 lg:p-8"
+        className="lg:w-[65%] relative rounded-xl border border-brand-500/20 p-5 sm:p-6 lg:p-8"
         style={{
-          minHeight: 'clamp(280px, 60vh, 480px)',
           background: 'linear-gradient(135deg, #1a1018 0%, #14121f 50%, #181420 100%)',
           boxShadow: '0 0 40px rgba(185, 28, 28, 0.08), 0 4px 24px rgba(0,0,0,0.4)',
         }}
         data-testid="hero-code-panel"
       >
-        {/* File tab bar */}
-        <div className="flex items-center justify-between mb-5 pb-4 border-b border-white/[0.06]">
-          <div className="flex items-center gap-3">
-            <div className="flex gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-brand-400/70" />
-              <div className="w-2.5 h-2.5 rounded-full bg-amber-400/60" />
-              <div className="w-2.5 h-2.5 rounded-full bg-teal-400/50" />
-            </div>
-            <span className="text-xs text-stone-500 font-mono">ReferralWidget.tsx</span>
-          </div>
-          {/* Prominent copy button — always visible */}
-          <button
-            onClick={handleCopy}
-            className="btn-primary text-sm px-5 py-2.5 gap-2"
-            aria-label="Copy quickstart code snippet"
-            data-testid="hero-copy-button"
-          >
-            {copied ? (
-              <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Copied!
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Copy
-              </>
-            )}
-          </button>
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/[0.06]">
+          <h3 className="text-sm font-semibold text-gray-300 tracking-wide uppercase">
+            Viral Coefficient Calculator
+          </h3>
+          <span className="text-xs text-gray-500 font-mono">K = i &times; c</span>
         </div>
 
-        {/* Syntax-highlighted code */}
-        <pre
-          data-testid="code-output"
-          className="text-xs sm:text-sm lg:text-base leading-relaxed sm:leading-relaxed lg:leading-loose font-mono"
-        >
-          <code>{highlighted}</code>
-        </pre>
+        {/* Sliders */}
+        <div className="flex flex-col gap-6">
+          {/* Invites per user */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="hero-invites" className="text-sm font-medium text-gray-300">
+                Invites per user <span className="text-gray-500 font-normal">(i)</span>
+              </label>
+              <span className="text-lg font-bold font-mono text-white" data-testid="hero-invites-value">
+                {invites}
+              </span>
+            </div>
+            <input
+              id="hero-invites"
+              type="range"
+              min={1}
+              max={10}
+              step={1}
+              value={invites}
+              onChange={(e) => setInvites(Number(e.target.value))}
+              className="w-full accent-brand-500 cursor-pointer"
+              aria-label="Average invites per user"
+            />
+          </div>
+
+          {/* Conversion rate */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="hero-conversion" className="text-sm font-medium text-gray-300">
+                Invite conversion rate <span className="text-gray-500 font-normal">(c)</span>
+              </label>
+              <span className="text-lg font-bold font-mono text-white" data-testid="hero-conversion-value">
+                {conversionRate}%
+              </span>
+            </div>
+            <input
+              id="hero-conversion"
+              type="range"
+              min={5}
+              max={50}
+              step={5}
+              value={conversionRate}
+              onChange={(e) => setConversionRate(Number(e.target.value))}
+              className="w-full accent-brand-500 cursor-pointer"
+              aria-label="Invite conversion rate percentage"
+            />
+          </div>
+        </div>
+
+        {/* K-factor result */}
+        <div className="mt-6 pt-5 border-t border-white/[0.06]">
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold mb-1">
+                Your K-Factor
+              </p>
+              <p
+                className={`text-4xl font-bold font-mono tracking-tight ${
+                  growthStatus === 'growth'
+                    ? 'text-emerald-400'
+                    : growthStatus === 'caution'
+                    ? 'text-amber-400'
+                    : 'text-brand-400'
+                }`}
+                data-testid="hero-kfactor"
+              >
+                {kFactor.toFixed(2)}
+              </p>
+            </div>
+            <div
+              className={`text-right text-sm font-medium ${
+                growthStatus === 'growth'
+                  ? 'text-emerald-400'
+                  : growthStatus === 'caution'
+                  ? 'text-amber-400'
+                  : 'text-brand-400'
+              }`}
+              data-testid="hero-status"
+            >
+              {growthStatus === 'growth'
+                ? 'Exponential growth — each user brings more than one new user'
+                : growthStatus === 'caution'
+                ? 'Slow growth — needs higher rewards or lower friction'
+                : 'Decay — referral channel is not self-sustaining'}
+            </div>
+          </div>
+
+          {/* K=1 reference indicator */}
+          <div className="mt-4 flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex-1 h-1 bg-gray-800 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${
+                  growthStatus === 'growth' ? 'bg-emerald-500' : growthStatus === 'caution' ? 'bg-amber-500' : 'bg-brand-500'
+                }`}
+                style={{ width: `${Math.min(kFactor / 2 * 100, 100)}%` }}
+              />
+            </div>
+            <span className="font-mono text-gray-600">K=1.0 threshold</span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -462,7 +409,7 @@ export function SnippetGenerator({
         {/* Small label for test compatibility */}
         <h2 className="text-lg font-semibold text-white tracking-tight">Snippet Generator</h2>
 
-        <HeroCodePanel />
+        <HeroCalculator />
 
         {/* Template selector below the code panel */}
         <div className="flex flex-col gap-2">
@@ -488,8 +435,6 @@ export function SnippetGenerator({
           </select>
         </div>
 
-        {/* SEO resource content — discoverability layer */}
-        <SEOContent />
       </div>
     );
   }
