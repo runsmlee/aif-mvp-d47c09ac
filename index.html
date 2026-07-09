@@ -11,7 +11,7 @@
     <meta name="description" content="Calculate if your referral program pays for itself. Free browser tool computes viral coefficient, CAC, and payback in seconds." />
     <meta property="og:title" content="ViralKit — Referral Economics Calculator" />
     <meta property="og:description" content="Calculate if your referral program pays for itself. Free browser tool computes viral coefficient, CAC, and payback in seconds." />
-    </head>
+  </head>
   <body class="bg-gray-950 text-gray-100">
     <div id="root">
       <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,-apple-system,sans-serif">
@@ -21,23 +21,55 @@
         </div>
       </div>
     </div>
-    <noscript>
-      <article style="max-width:720px;margin:0 auto;padding:48px 24px;font-family:system-ui,sans-serif;color:#d1d5db">
-        <h2>Viral Coefficient Calculator</h2>
-        <p>The <strong>K-factor</strong> (also called the <strong>viral coefficient</strong>) is the single most important metric for understanding whether your referral program can grow on its own. A K-factor above 1 means every user brings in more than one new user — exponential organic growth. Below 1, your referral channel is slowly decaying and needs a higher reward or lower friction to sustain momentum.</p>
-        <h3>The K-Factor Formula: K = i × c</h3>
-        <p>The <strong>K-factor formula</strong> is straightforward: <code>K = i × c</code>, where <strong>i</strong> is the average number of invites each user sends and <strong>c</strong> is the conversion rate of those invites. If each user invites 4 friends (i = 4) and 25% of those friends sign up (c = 0.25), your K-factor is 4 × 0.25 = <strong>1.0</strong>. At K = 1.0, every user replaces themselves — you have steady-state viral growth. Push that conversion to 30% and K jumps to 1.2, meaning each user brings in 1.2 new users. That compounding effect is what separates referral programs that stall from those that scale. Use our <strong>viral coefficient calculator</strong> above to model your own growth loop.</p>
-        <h2>Referral Program Break-Even Analysis</h2>
-        <p>Launching a referral program is an investment, and growth engineers need to know the payback period before shipping. The core question is simple: how does the <strong>referral program ROI</strong> compare to your baseline customer acquisition cost?</p>
-        <h3>CAC vs LTV: The Referral Economics Framework</h3>
-        <p>Start with three numbers. First, your current <strong>customer acquisition cost (CAC)</strong> from paid channels — say $120 per user. Second, the cost of your referral reward — maybe a $20 credit. Third, your invite-to-signup conversion rate. If 1 in 4 invites converts, each referring user who invites 5 friends generates 1.25 new signups at a cost of $20 each. That is a <strong>referral CAC of $20</strong> versus $120 paid — a 6x improvement. When your <strong>customer lifetime value (LTV)</strong> exceeds that $20 referral CAC, the channel is profitable from day one.</p>
-        <p>Most SaaS companies see their referral channel reach <strong>referral program break-even</strong> within 60-90 days of launch, assuming a K-factor above 0.7. Below 0.5, the channel needs paid amplification (e.g., double-sided rewards) to sustain momentum. The key insight: referral programs compound. Month-over-month, a healthy K-factor makes every cohort cheaper to acquire than the last.</p>
-        <h2>K-Factor Formula Explained</h2>
-        <p>A referral program's ROI depends on the interplay between invite volume, conversion rate, reward cost, and the lifetime value of referred users. Growth engineers at SaaS startups can model all of these variables in seconds using a <strong>viral coefficient calculator</strong> instead of building a spreadsheet from scratch.</p>
-        <h3>Step-by-Step: Using This Calculator</h3>
-        <p>First, estimate your average invites per user. If your product has a share button or referral link, check your analytics — most consumer-facing apps see 2-6 invites per active user. Enter that number as your <strong>invite count (i)</strong>. Next, estimate your conversion rate. Industry benchmarks for referral programs range from 15-35%, but your actual rate depends on incentive strength and friction in the signup flow. The calculator computes your K-factor instantly: if K is above 1, your program is self-sustaining.</p>
-        <p>To translate that into ROI, compare your referral CAC (reward cost divided by signups per referrer) against your paid CAC. A referral program that costs $20 per acquisition against a paid CAC of $120 delivers a 6x return on every dollar moved from paid to referral channels. Factor in that referred users typically have 16-25% higher retention than paid users, and the long-term <strong>referral program ROI</strong> becomes even more compelling.</p>
+
+    <!-- ─────────── SEO Content Sections (visible in initial HTML for crawlers) ─────────── -->
+    <section
+      id="seo-content"
+      aria-label="Learn more about referral economics"
+      style="max-width:768px;margin:0 auto;padding:64px 24px;border-top:1px solid rgba(75,85,99,0.4);font-family:system-ui,-apple-system,sans-serif;color:#9ca3af;"
+    >
+      <article style="margin-bottom:64px;">
+        <h2 style="color:#f3f4f6;font-size:1.25rem;font-weight:700;margin:0 0 16px;">Viral Coefficient Calculator</h2>
+        <p style="font-size:0.875rem;line-height:1.7;margin:0 0 16px;">
+          The <strong style="color:#e5e7eb;">K-factor</strong> (also called the <strong style="color:#e5e7eb;">viral coefficient</strong>) is the single most important metric for understanding whether your referral program can grow on its own. A K-factor above 1 means every user brings in more than one new user — exponential organic growth. Below 1, your referral channel is slowly decaying and needs a higher reward or lower friction to sustain momentum. This tool computes your K-factor in real time as you adjust the invitation and conversion parameters, so you can model different growth scenarios instantly without building a spreadsheet from scratch.
+        </p>
+        <h3 style="color:#e5e7eb;font-size:1rem;font-weight:600;margin:0 0 12px;">The K-Factor Formula: K = i &times; c</h3>
+        <p style="font-size:0.875rem;line-height:1.7;margin:0;">
+          The <strong style="color:#e5e7eb;">K-factor formula</strong> is straightforward: <code style="background:#1f2937;padding:2px 6px;border-radius:3px;color:#f87171;font-size:0.75rem;font-family:monospace;">K = i &times; c</code>, where <strong style="color:#e5e7eb;">i</strong> is the average number of invites each user sends and <strong style="color:#e5e7eb;">c</strong> is the conversion rate of those invites. If each user invites 4 friends (<strong style="color:#e5e7eb;">i = 4</strong>) and 25% of those friends sign up (<strong style="color:#e5e7eb;">c = 0.25</strong>), your K-factor is 4 &times; 0.25 = <strong style="color:#e5e7eb;">1.0</strong>. At K = 1.0, every user replaces themselves — you have steady-state viral growth. Push that conversion to 30% and K jumps to 1.2, meaning each user brings in 1.2 new users. That compounding effect is what separates referral programs that stall from those that scale. Use our <strong style="color:#e5e7eb;">viral coefficient calculator</strong> above to model your own growth loop.
+        </p>
       </article>
+
+      <article style="margin-bottom:64px;">
+        <h2 style="color:#f3f4f6;font-size:1.25rem;font-weight:700;margin:0 0 16px;">Referral Program Break-Even Analysis</h2>
+        <p style="font-size:0.875rem;line-height:1.7;margin:0 0 16px;">
+          Launching a referral program is an investment, and growth engineers need to know the payback period before shipping. The core question is simple: how does the <strong style="color:#e5e7eb;">referral program ROI</strong> compare to your baseline customer acquisition cost? Understanding this ratio determines whether your referral economics are viable or whether you are subsidizing growth at a loss. A well-structured referral program should lower your blended CAC while maintaining or improving the quality of acquired users.
+        </p>
+        <h3 style="color:#e5e7eb;font-size:1rem;font-weight:600;margin:0 0 12px;">CAC vs LTV: The Referral Economics Framework</h3>
+        <p style="font-size:0.875rem;line-height:1.7;margin:0 0 16px;">
+          Start with three numbers. First, your current <strong style="color:#e5e7eb;">customer acquisition cost (CAC)</strong> from paid channels — say $120 per user. Second, the cost of your referral reward — maybe a $20 credit. Third, your invite-to-signup conversion rate. If 1 in 4 invites converts, each referring user who invites 5 friends generates 1.25 new signups at a cost of $20 each. That is a <strong style="color:#e5e7eb;">referral CAC of $20</strong> versus $120 paid — a 6x improvement. When your <strong style="color:#e5e7eb;">customer lifetime value (LTV)</strong> exceeds that $20 referral CAC, the channel is profitable from day one.
+        </p>
+        <p style="font-size:0.875rem;line-height:1.7;margin:0;">
+          Most SaaS companies see their referral channel reach <strong style="color:#e5e7eb;">referral program break even</strong> within 60-90 days of launch, assuming a K-factor above 0.7. Below 0.5, the channel needs paid amplification (e.g., double-sided rewards) to sustain momentum. The key insight: referral programs compound. Month-over-month, a healthy K-factor makes every cohort cheaper to acquire than the last. This compounding effect is what makes referral programs one of the highest-ROI growth channels when structured correctly.
+        </p>
+      </article>
+
+      <article>
+        <h2 style="color:#f3f4f6;font-size:1.25rem;font-weight:700;margin:0 0 16px;">K-Factor Formula Explained</h2>
+        <p style="font-size:0.875rem;line-height:1.7;margin:0 0 16px;">
+          A referral program's ROI depends on the interplay between invite volume, conversion rate, reward cost, and the lifetime value of referred users. Growth engineers at SaaS startups can model all of these variables in seconds using a <strong style="color:#e5e7eb;">viral coefficient calculator</strong> instead of building a spreadsheet from scratch. Understanding each variable's sensitivity helps you identify which lever — increasing invites, improving conversion, or reducing reward cost — will have the biggest impact on your growth trajectory.
+        </p>
+        <h3 style="color:#e5e7eb;font-size:1rem;font-weight:600;margin:0 0 12px;">Step-by-Step: Using This Calculator</h3>
+        <p style="font-size:0.875rem;line-height:1.7;margin:0 0 16px;">
+          First, estimate your average invites per user. If your product has a share button or referral link, check your analytics — most consumer-facing apps see 2-6 invites per active user. Enter that number as your <strong style="color:#e5e7eb;">invite count (i)</strong>. Next, estimate your conversion rate. Industry benchmarks for referral programs range from 15-35%, but your actual rate depends on incentive strength and friction in the signup flow. The calculator computes your K-factor instantly: if K is above 1, your program is self-sustaining and will grow organically without paid acquisition spend.
+        </p>
+        <p style="font-size:0.875rem;line-height:1.7;margin:0;">
+          To translate that into ROI, compare your referral CAC (reward cost divided by signups per referrer) against your paid CAC. A referral program that costs $20 per acquisition against a paid CAC of $120 delivers a 6x return on every dollar moved from paid to referral channels. Factor in that referred users typically have 16-25% higher retention than paid users, and the long-term <strong style="color:#e5e7eb;">referral program ROI</strong> becomes even more compelling. Use the calculator above to model your specific numbers and determine whether your referral program will pay for itself.
+        </p>
+      </article>
+    </section>
+
+    <noscript>
+      <p style="text-align:center;padding:24px;color:#6b7280;font-family:system-ui,sans-serif;">This interactive calculator requires JavaScript. The content sections above are fully readable without it.</p>
     </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
