@@ -11,6 +11,46 @@
     <meta name="description" content="Calculate if your referral program pays for itself. Free browser tool computes viral coefficient, CAC, and payback in seconds." />
     <meta property="og:title" content="ViralKit — Referral Economics Calculator" />
     <meta property="og:description" content="Calculate if your referral program pays for itself. Free browser tool computes viral coefficient, CAC, and payback in seconds." />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do you calculate the viral coefficient (K-factor)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The viral coefficient, or K-factor, is calculated with the formula K = i × c, where i is the average number of invites each user sends and c is the conversion rate of those invites. For example, if each user invites 4 friends and 25% of those friends sign up, your K-factor is 4 × 0.25 = 1.0. A K-factor above 1 means every user brings in more than one new user, resulting in exponential organic growth. Below 1, your referral channel is decaying and needs a higher reward or lower friction to sustain momentum."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is a good K-factor for SaaS?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For SaaS companies, a K-factor above 1.0 indicates self-sustaining viral growth — every user replaces themselves and then some. A K-factor between 0.7 and 1.0 is considered healthy and typically reaches referral program break-even within 60 to 90 days of launch. Below 0.5, the referral channel needs paid amplification such as double-sided rewards to sustain momentum. Most consumer-facing SaaS apps see 2 to 6 invites per active user with referral conversion rates ranging from 15% to 35%."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "When does a referral program break even?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A referral program breaks even when the cost of acquiring a user through referrals is lower than your paid customer acquisition cost (CAC). For example, if your paid CAC is $120 and your referral reward costs $20 per signup, the referral channel delivers a 6x improvement. Most SaaS companies see their referral channel reach break-even within 60 to 90 days of launch when the K-factor is above 0.7. Because referral programs compound month over month, a healthy K-factor makes every cohort cheaper to acquire than the last, especially since referred users typically have 16 to 25% higher retention than paid users."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between referral CAC and paid CAC?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Referral CAC is the cost of acquiring a user through your referral program — typically the reward cost divided by the number of signups per referrer. Paid CAC is the cost of acquiring a user through paid channels like ads or sponsorships. If your paid CAC is $120 and each referring user who invites 5 friends generates 1.25 new signups at a $20 reward cost, your referral CAC is $20 versus $120 paid — a 6x improvement. When your customer lifetime value (LTV) exceeds the referral CAC, the channel is profitable from day one."
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body class="bg-gray-950 text-gray-100">
     <div id="root">

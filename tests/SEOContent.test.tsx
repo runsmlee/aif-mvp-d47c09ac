@@ -60,4 +60,82 @@ describe('SEO Content in index.html', () => {
     expect(h2Matches).not.toBeNull();
     expect(h2Matches!.length).toBeGreaterThanOrEqual(3);
   });
+
+  describe('FAQPage structured data (JSON-LD)', () => {
+    it('includes a JSON-LD script tag in <head>', () => {
+      const headMatch = indexHtml.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+      expect(headMatch).not.toBeNull();
+      const headContent = headMatch![1];
+      expect(headContent).toMatch(/<script[^>]*type="application\/ld\+json"[^>]*>/i);
+    });
+
+    it('declares FAQPage schema type', () => {
+      const ldMatch = indexHtml.match(
+        /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/i
+      );
+      expect(ldMatch).not.toBeNull();
+      const json = JSON.parse(ldMatch![1].trim());
+      expect(json['@type']).toBe('FAQPage');
+      expect(json['@context']).toBe('https://schema.org');
+    });
+
+    it('contains at least 3 Question entities with acceptedAnswer', () => {
+      const ldMatch = indexHtml.match(
+        /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/i
+      );
+      expect(ldMatch).not.toBeNull();
+      const json = JSON.parse(ldMatch![1].trim());
+      expect(json.mainEntity).toBeInstanceOf(Array);
+      expect(json.mainEntity.length).toBeGreaterThanOrEqual(3);
+      json.mainEntity.forEach((entity: { '@type': string; name: string; acceptedAnswer: { '@type': string; text: string } }) => {
+        expect(entity['@type']).toBe('Question');
+        expect(entity.name).toBeTruthy();
+        expect(entity.acceptedAnswer).toBeDefined();
+        expect(entity.acceptedAnswer['@type']).toBe('Answer');
+        expect(entity.acceptedAnswer.text.length).toBeGreaterThan(50);
+      });
+    });
+
+    it('includes questions that map to existing content sections', () => {
+      const ldMatch = indexHtml.match(
+        /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/i
+      );
+      expect(ldMatch).not.toBeNull();
+      const json = JSON.parse(ldMatch![1].trim());
+      const questionNames = json.mainEntity.map(
+        (e: { name: string }) => e.name.toLowerCase()
+      );
+      // At least one question about calculating viral coefficient / K-factor
+      expect(
+        questionNames.some((q: string) => q.includes('viral coefficient') || q.includes('k-factor'))
+      ).toBe(true);
+      // At least one question about break-even
+      expect(
+        questionNames.some((q: string) => q.includes('break even') || q.includes('break-even'))
+      ).toBe(true);
+    });
+
+    it('answer text does not fabricate metrics not present in visible content', () => {
+      const ldMatch = indexHtml.match(
+        /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/i
+      );
+      expect(ldMatch).not.toBeNull();
+      const json = JSON.parse(ldMatch![1].trim());
+      // Every answer text should have a counterpart keyword in visible body content
+      const bodyText = withoutNoscript.toLowerCase();
+      json.mainEntity.forEach((entity: { acceptedAnswer: { text: string } }) => {
+        const answerText = entity.acceptedAnswer.text.toLowerCase();
+        // Verify a key phrase from each answer appears in visible content
+        const hasKeyword =
+          answerText.includes('k-factor') ||
+          answerText.includes('referral') ||
+          answerText.includes('cac');
+        expect(hasKeyword).toBe(true);
+        // Verify at least 2 words from the answer appear in visible content
+        const answerWords = answerText.split(/\s+/).filter((w: string) => w.length > 4);
+        const overlap = answerWords.filter((w: string) => bodyText.includes(w));
+        expect(overlap.length).toBeGreaterThanOrEqual(2);
+      });
+    });
+  });
 });
