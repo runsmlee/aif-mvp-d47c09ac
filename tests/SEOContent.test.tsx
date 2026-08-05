@@ -113,6 +113,10 @@ describe('SEO Content in index.html', () => {
       expect(
         questionNames.some((q: string) => q.includes('break even') || q.includes('break-even'))
       ).toBe(true);
+      // At least one question about referral program ROI
+      expect(
+        questionNames.some((q: string) => q.includes('referral program roi'))
+      ).toBe(true);
     });
 
     it('answer text does not fabricate metrics not present in visible content', () => {
